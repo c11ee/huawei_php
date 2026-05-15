@@ -28,21 +28,21 @@ class PermissionController extends Controller
     public function store(PermissionRequest $request)
     {
         $validated =  $request->validated();
-
-        // $permission = Permission::create([
-        //     'name' => $request->name,
-        //     'label' => $request->label,
-        //     'path' => $request->path,
-        //     'icon' => $request->icon,
-        //     'type' => $request->type,
-        //     'sort' => $request->sort,
-        //     'is_auth' => $request->is_auth,
-        //     'remark' => $request->remark,
-        // ]);
+        $data = [
+            'name' => $validated['key'],
+            'label' => $validated['name'],
+            'path' => $validated['path'],
+            'icon' => $validated['icon'],
+            'type' => $validated['type'],
+            'sort' => $validated['sort'],
+            'is_auth' => $validated['is_auth'],
+            'remark' => $validated['remark'],
+        ];
+        Permission::create($data);
 
         return response()->json([
-            'message' => '验证通过',
-            'data' => $validated,
+            'message' => '添加成功',
+            'data' => [],
         ]);
     }
 

@@ -20,13 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (Throwable $e, $request) {
             // 只处理 API 请求
             if ($request->expectsJson()) {
-                $errorMessage = $e->validator->errors()->first();
                 // ✅ 1. 表单验证错误
                 if ($e instanceof ValidationException) {
                     return response()->json([
                         'code' => 0,
                         // 获取第一个错误
-                        'message' => $errorMessage,
+                        'message' => $e->validator->errors()->first(),
                     ], 200);
                 }
 
@@ -34,16 +33,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 if ($e instanceof HttpExceptionInterface) {
                     return response()->json([
                         'code' => $e->getStatusCode(),
-                        'message' => $errorMessage,
+                        'message' => $e->validator->errors()->first(),
                     ], $e->getStatusCode());
                 }
 
                 // ✅ 3. 其他异常（500）
                 return response()->json([
                     'code' => 500,
-                    'message' => config('app.debug')
-                        ? $errorMessage
-                        : '服务器内部错误',
+                    'message' => $e->getMessage(),
                 ], 500);
             }
         });

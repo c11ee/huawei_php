@@ -23,6 +23,7 @@ class PermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'key' => 'required|string|max:255|unique:permissions,name',
             'name' => 'required|string|max:255',
             'path' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
@@ -36,6 +37,9 @@ class PermissionRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'key.required' => '权限标识不能为空',
+            'key.string' => '权限标识必须为字符串',
+            'key.unique' => '权限标识已存在',
             'name.required' => '权限名称不能为空',
             'path.string' => '权限路径必须为字符串',
             'icon.string' => '权限图标必须为字符串',
