@@ -23,7 +23,7 @@ class PermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'key' => 'required|string|max:255|unique:permissions,name',
+            'key' =>  'required|string|max:255' . ($this->method() == 'POST' ? '|unique:permissions,name' : ''),
             'name' => 'required|string|max:255',
             'path' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
