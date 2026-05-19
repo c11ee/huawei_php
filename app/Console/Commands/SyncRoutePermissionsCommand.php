@@ -100,7 +100,7 @@ class SyncRoutePermissionsCommand extends Command
     {
         $rows = [];
 
-        foreach (config('permission_sync.modules', []) as $slug => $module) {
+        foreach ((array) config('permission_sync.modules', []) as $slug => $module) {
             $sort = (int) ($module['sort'] ?? 0);
             $rows[] = [
                 '_slug' => $slug,
