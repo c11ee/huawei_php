@@ -3,4 +3,7 @@
 use App\Http\Controllers\Api\PermissionController;
 use Illuminate\Support\Facades\Route;
 
-Route::apiResource('permissions', PermissionController::class);
+Route::apiResource('permissions', PermissionController::class)->parameters([
+    // 在路由里映射
+    'permissions' => 'id',
+]);

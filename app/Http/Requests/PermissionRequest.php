@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class PermissionRequest extends FormRequest
 {
@@ -23,7 +24,17 @@ class PermissionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'key' =>  'required|string|max:255' . ($this->method() == 'POST' ? '|unique:permissions,name' : ''),
+            'key' =>  [
+                'required',
+                'string',
+                'max:255',
+                // 校验是否有重复
+                Rule::unique('permissions', 'name')
+                    // 校验唯一时, 忽略某一行
+                    ->ignore(
+                        $this->isMethod('POST') ? null : $this->route('id')
+                    ),
+            ],
             'name' => 'required|string|max:255',
             'path' => 'nullable|string|max:255',
             'icon' => 'nullable|string|max:255',
