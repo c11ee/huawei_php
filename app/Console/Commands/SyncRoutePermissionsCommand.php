@@ -12,7 +12,7 @@ use Spatie\Permission\Models\Permission;
 class SyncRoutePermissionsCommand extends Command
 {
     protected $signature = 'permissions:sync-routes
-                            {--guard=web : Spatie guard_name}
+                            {--guard=api : Spatie guard_name}
                             {--prefix=api : 只同步 URI 以此前缀开头的路由}
                             {--dry-run : 仅预览，不写入数据库}';
 
