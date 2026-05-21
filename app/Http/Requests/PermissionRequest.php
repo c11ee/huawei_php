@@ -42,6 +42,7 @@ class PermissionRequest extends FormRequest
             'sort' => 'required|integer|min:0',
             'is_auth' => 'required|integer|in:1,2',
             'remark' => 'nullable|string|max:255',
+            'parent_id' => 'nullable|integer|min:0',
         ];
     }
 
@@ -58,10 +59,12 @@ class PermissionRequest extends FormRequest
             'type.in' => '权限类型必须为1或2',
             'sort.required' => '排序不能为空',
             'sort.integer' => '排序必须为整数',
-            'sort.min' => '排序必须大于0',
+            'sort.min' => '排序不能小于0',
             'is_auth.required' => '是否认证不能为空',
             'is_auth.in' => '是否验证必须为1或2',
             'remark.string' => '备注必须为字符串',
+            'parent_id.integer' => '父级ID必须为整数',
+            'parent_id.min' => '父级ID不能小于0',
         ];
     }
 }

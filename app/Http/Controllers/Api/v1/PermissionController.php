@@ -15,8 +15,9 @@ class PermissionController extends Controller
     {
         $query = Permission::query();
 
-        // 返回所有数据，不进行分页
-        return Controller::success($query->get());
+        $list = $query->orderBy('sort', 'desc')->get()->map(fn($item) => $this->formatPermission($item))->all();
+
+        return Controller::success($this->handleTreeData($list));
     }
 
     /**
@@ -24,18 +25,7 @@ class PermissionController extends Controller
      */
     public function store(PermissionRequest $request)
     {
-        $validated =  $request->validated();
-        $data = [
-            'name' => $validated['key'],
-            'label' => $validated['name'],
-            'path' => $validated['path'] ?? '',
-            'icon' => $validated['icon'] ?? '',
-            'type' => $validated['type'],
-            'sort' => $validated['sort'],
-            'is_auth' => $validated['is_auth'],
-            'remark' => $validated['remark'] ?? '',
-        ];
-        Permission::create($data);
+        Permission::create($this->toModelData($request->validated()));
         return Controller::success([], '添加成功');
     }
 
@@ -48,8 +38,35 @@ class PermissionController extends Controller
         if (!$permission) {
             return Controller::error("数据不存在");
         }
-        $validated =  $request->validated();
-        $data = [
+        $permission->update($this->toModelData($request->validated()));
+        return Controller::success([], '更新成功');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        if (!$id) {
+            return Controller::error("参数错误");
+        }
+        $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
+        if ($ids === []) {
+            return Controller::error('参数错误');
+        }
+
+        $idsToDelete = $this->collectIdsWithDescendants(Permission::class, $ids);
+
+        Permission::destroy($idsToDelete);
+        return Controller::success([], '删除成功');
+    }
+
+    /**
+     * 请求参数 → 模型字段
+     */
+    private function toModelData(array $validated): array
+    {
+        return [
             'name' => $validated['key'],
             'label' => $validated['name'],
             'path' => $validated['path'] ?? '',
@@ -58,22 +75,28 @@ class PermissionController extends Controller
             'sort' => $validated['sort'],
             'is_auth' => $validated['is_auth'],
             'remark' => $validated['remark'] ?? '',
+            'parent_id' => $validated['parent_id'] ?? 0,
         ];
-        $permission->update($data);
-        return Controller::success([], '更新成功');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * 模型 → API 出参
      */
-    public function destroy(string $ids)
+    private function formatPermission(Permission $item): array
     {
-        if (!$ids) {
-            return Controller::error("参数错误");
-        }
-        $ids = explode(',', $ids);
-
-        Permission::destroy($ids);
-        return Controller::success([], '删除成功');
+        return [
+            'id' => $item->id,
+            'key' => $item->name,
+            'name' => $item->label,
+            'path' => $item->path,
+            'icon' => $item->icon,
+            'type' => $item->type,
+            'sort' => $item->sort,
+            'is_auth' => $item->is_auth,
+            'remark' => $item->remark,
+            'parent_id' => $item->parent_id,
+            'created_at' => $this->serializeDate($item->created_at),
+            'updated_at' => $this->serializeDate($item->updated_at),
+        ];
     }
 }
