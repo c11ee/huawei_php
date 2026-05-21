@@ -4,10 +4,15 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionRequest;
+use App\Traits\ApiResponseTrait;
+use App\Traits\ModelDeleteTrait;
+use App\Traits\TreeTrait;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
+    use ApiResponseTrait, TreeTrait, ModelDeleteTrait;
+
     /**
      * 权限列表
      */
@@ -17,7 +22,7 @@ class PermissionController extends Controller
 
         $list = $query->orderBy('sort', 'desc')->get()->map(fn($item) => $this->formatPermission($item))->all();
 
-        return Controller::success($this->handleTreeData($list));
+        return $this->success($this->handleTreeData($list));
     }
 
     /**
@@ -26,7 +31,7 @@ class PermissionController extends Controller
     public function store(PermissionRequest $request)
     {
         Permission::create($this->toModelData($request->validated()));
-        return Controller::success([], '添加成功');
+        return $this->success([], '添加成功');
     }
 
     /**
@@ -36,10 +41,10 @@ class PermissionController extends Controller
     {
         $permission = Permission::find($id);
         if (!$permission) {
-            return Controller::error("数据不存在");
+            return $this->error("数据不存在");
         }
         $permission->update($this->toModelData($request->validated()));
-        return Controller::success([], '更新成功');
+        return $this->success([], '更新成功');
     }
 
     /**
@@ -48,17 +53,17 @@ class PermissionController extends Controller
     public function destroy(string $id)
     {
         if (!$id) {
-            return Controller::error("参数错误");
+            return $this->error("参数错误");
         }
         $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
         if ($ids === []) {
-            return Controller::error('参数错误');
+            return $this->error('参数错误');
         }
 
         $idsToDelete = $this->collectIdsWithDescendants(Permission::class, $ids);
 
         Permission::destroy($idsToDelete);
-        return Controller::success([], '删除成功');
+        return $this->success([], '删除成功');
     }
 
     /**
