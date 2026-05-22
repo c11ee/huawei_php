@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Traits;
+namespace App\Http\Responses;
 
-trait ApiResponseTrait
+class ApiResponse
 {
     /**
      * 成功响应
      */
-    public function success($data = [], $msg = 'ok')
+    public static function success($data = [], string $msg = 'ok')
     {
         return response()->json([
             'code' => 200,
@@ -19,11 +19,8 @@ trait ApiResponseTrait
     /**
      * 失败响应
      */
-    public function error(
-        string $msg = 'error',
-        int $code = 0,
-        $data = []
-    ) {
+    public static function error(string $msg = 'error', int $code = 0, $data = [])
+    {
         return response()->json([
             'code' => $code,
             'msg' => $msg,

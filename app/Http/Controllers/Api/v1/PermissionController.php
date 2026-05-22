@@ -4,14 +4,14 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionRequest;
-use App\Traits\ApiResponseTrait;
+use App\Http\Responses\ApiResponse;
 use App\Traits\ModelDeleteTrait;
 use App\Traits\TreeTrait;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
 {
-    use ApiResponseTrait, TreeTrait, ModelDeleteTrait;
+    use  TreeTrait, ModelDeleteTrait;
 
     /**
      * 权限列表
@@ -22,7 +22,7 @@ class PermissionController extends Controller
 
         $list = $query->orderBy('sort', 'desc')->get()->map(fn($item) => $this->formatPermission($item))->all();
 
-        return $this->success($this->handleTreeData($list));
+        return ApiResponse::success($this->handleTreeData($list));
     }
 
     /**
@@ -31,7 +31,7 @@ class PermissionController extends Controller
     public function store(PermissionRequest $request)
     {
         Permission::create($this->toModelData($request->validated()));
-        return $this->success([], '添加成功');
+        return ApiResponse::success([], '添加成功');
     }
 
     /**
@@ -41,10 +41,10 @@ class PermissionController extends Controller
     {
         $permission = Permission::find($id);
         if (!$permission) {
-            return $this->error("数据不存在");
+            return ApiResponse::error("数据不存在");
         }
         $permission->update($this->toModelData($request->validated()));
-        return $this->success([], '更新成功');
+        return ApiResponse::success([], '更新成功');
     }
 
     /**
@@ -53,17 +53,17 @@ class PermissionController extends Controller
     public function destroy(string $id)
     {
         if (!$id) {
-            return $this->error("参数错误");
+            return ApiResponse::error("参数错误");
         }
         $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
         if ($ids === []) {
-            return $this->error('参数错误');
+            return ApiResponse::error('参数错误');
         }
 
         $idsToDelete = $this->collectIdsWithDescendants(Permission::class, $ids);
 
         Permission::destroy($idsToDelete);
-        return $this->success([], '删除成功');
+        return ApiResponse::success([], '删除成功');
     }
 
     /**
@@ -100,8 +100,8 @@ class PermissionController extends Controller
             'is_auth' => $item->is_auth,
             'remark' => $item->remark,
             'parent_id' => $item->parent_id,
-            'created_at' => $this->serializeDate($item->created_at),
-            'updated_at' => $this->serializeDate($item->updated_at),
+            'created_at' => $item->created_at,
+            'updated_at' => $item->updated_at,
         ];
     }
 }
