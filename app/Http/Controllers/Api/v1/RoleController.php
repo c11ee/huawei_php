@@ -4,13 +4,13 @@ namespace App\Http\Controllers\Api\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RoleRequest;
-use App\Traits\ApiResponseTrait;
+use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use App\Models\Permission;
+use App\Models\Role;
 
 class RoleController extends Controller
 {
-    use ApiResponseTrait;
 
     /**
      * Display a listing of the resource.
@@ -21,7 +21,7 @@ class RoleController extends Controller
 
         // 搜索
         if ($request->name) {
-            $query->where('name', 'like', '%' . $request->keyword . '%');
+            $query->where('name', 'like', '%' . $request->name . '%');
         }
 
         $list = $query->paginate(
@@ -31,7 +31,7 @@ class RoleController extends Controller
             $request->input('page', 1)
         );
 
-        return $this->success([
+        return ApiResponse::success([
             'data' => $list->items(),
             'total' => $list->total(),
         ]);
@@ -42,10 +42,19 @@ class RoleController extends Controller
      */
     public function store(RoleRequest $request)
     {
-        dd($request->permission_ids);
-        // $role = Role::create($request->validated());
-        // $role->permissions()->sync($request->permission_ids);
-        // return $this->success([], '添加成功');
+        // 创建角色
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => 'api',
+        ]);
+
+        // 分配权限
+        if (!empty($request->permission_ids)) {
+            $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+            $role->syncPermissions($permissions);
+        }
+
+        return ApiResponse::success([], '添加成功');
     }
 
     /**
