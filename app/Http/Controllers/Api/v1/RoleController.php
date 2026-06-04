@@ -17,7 +17,8 @@ class RoleController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Role::query();
+        // 预加载 permissions 关联关系
+        $query = Role::query()->with('permissions');
 
         // 搜索
         if ($request->name) {
@@ -32,6 +33,8 @@ class RoleController extends Controller
             return [
                 'id' => $item->id,
                 'name' => $item->name,
+                // 权限ID列表
+                'permissions' => $item->permissions->pluck('id'),
                 'created_at' => $item->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
                 'created_at_ts' => $item->created_at?->timestamp ?? 0,
@@ -71,7 +74,22 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // 更新角色
+        $role = Role::find($id);
+        if (!$role) {
+            return ApiResponse::error("数据不存在");
+        }
+        $role->update([
+            'name' => $request->name,
+        ]);
+
+        // 分配权限
+        if (!empty($request->permission_ids)) {
+            $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+            $role->syncPermissions($permissions);
+        }
+
+        return ApiResponse::success([], '更新成功');
     }
 
     /**
@@ -79,6 +97,16 @@ class RoleController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if (!$id) {
+            return ApiResponse::error("参数错误");
+        }
+        $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
+        if ($ids === []) {
+            return ApiResponse::error('参数错误');
+        }
+
+        Role::destroy($ids);
+
+        return ApiResponse::success([], '删除成功');
     }
 }
