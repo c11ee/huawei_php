@@ -26,13 +26,22 @@ class RoleController extends Controller
 
         $list = $query->paginate(
             $request->input('limit', 10),
-            ['*'],
-            'page',
-            $request->input('page', 1)
         );
 
+        $data = collect($list->items())->map(function ($item) {
+            return [
+                'id' => $item->id,
+                'name' => $item->name,
+                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
+                'created_at_ts' => $item->created_at?->timestamp ?? 0,
+                'updated_at_ts' => $item->updated_at?->timestamp ?? 0,
+            ];
+        })->toArray();
+
         return ApiResponse::success([
-            'data' => $list->items(),
+            'data' => $data,
+            'page' => $list->currentPage(),
             'total' => $list->total(),
         ]);
     }
