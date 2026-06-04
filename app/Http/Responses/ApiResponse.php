@@ -29,8 +29,4 @@ class ApiResponse
             'data' => $data,
         ]);
     }
-
-    /**
-     * 格式化时间字段
-     */
 }

@@ -35,8 +35,8 @@ class RoleController extends Controller
                 'name' => $item->name,
                 // 权限ID列表
                 'permissions' => $item->permissions->pluck('id'),
-                'created_at' => $item->created_at->format('Y-m-d H:i:s'),
-                'updated_at' => $item->updated_at->format('Y-m-d H:i:s'),
+                'created_at' => $this->serializeDate($item->created_at),
+                'updated_at' => $this->serializeDate($item->updated_at),
                 'created_at_ts' => $item->created_at?->timestamp ?? 0,
                 'updated_at_ts' => $item->updated_at?->timestamp ?? 0,
             ];
