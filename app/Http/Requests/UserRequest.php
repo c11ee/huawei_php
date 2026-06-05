@@ -24,7 +24,6 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'avatar' => 'required|string',
             'username' => 'required|string|max:255',
             'phone' => [
                 'required',
@@ -39,14 +38,13 @@ class UserRequest extends FormRequest
             ],
             'status' => 'required|in:0,1',
             'role_id' => 'required|integer|exists:roles,id',
-            'password' => 'required|string|min:8|max:128',
+            'password' => 'required|string|min:6|max:128',
         ];
     }
 
     public function messages(): array
     {
         return [
-            'avatar.required' => '请上传头像',
             'username.required' => '请输入用户名',
             'phone.required' => '请输入手机号',
             'phone.regex' => '手机号格式错误',
@@ -54,7 +52,7 @@ class UserRequest extends FormRequest
             'status.required' => '请选择状态',
             'role_id.required' => '请选择角色',
             'password.required' => '请输入密码',
-            'password.min' => '密码长度不能小于8位',
+            'password.min' => '密码长度不能小于6位',
             'password.max' => '密码长度不能大于128位',
         ];
     }
