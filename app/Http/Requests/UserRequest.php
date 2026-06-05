@@ -38,7 +38,12 @@ class UserRequest extends FormRequest
             ],
             'status' => 'required|in:0,1',
             'role_id' => 'required|integer|exists:roles,id',
-            'password' => 'required|string|min:6|max:128',
+            'password' => [
+                $this->isMethod('POST') ? 'required' : '',
+                'string',
+                'min:6',
+                'max:128',
+            ],
         ];
     }
 

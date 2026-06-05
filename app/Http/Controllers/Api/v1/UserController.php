@@ -58,7 +58,13 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $user = User::with('role')->find($id);
+
+        if (!$user) {
+            return ApiResponse::error('用户不存在', 404);
+        }
+
+        return ApiResponse::success(new UserResource($user));
     }
 
     /**
@@ -66,7 +72,25 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, string $id)
     {
-        //
+        $user = User::with('role')->find($id);
+
+        if (!$user) {
+            return ApiResponse::error('用户不存在', 404);
+        }
+
+        $data = [
+            'username' => $request->username,
+            'phone' => $request->phone,
+            'status' => $request->status,
+            'role_id' => $request->role_id,
+            'avatar' => $request->avatar ?? '',
+        ];
+        if ($request->password) {
+            $data['password'] = bcrypt($request->password);
+        }
+        $user->update($data);
+
+        return ApiResponse::success([], '更新成功');
     }
 
     /**
@@ -74,6 +98,16 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        if (!$id) {
+            return ApiResponse::error("参数错误");
+        }
+        $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
+        if ($ids === []) {
+            return ApiResponse::error('参数错误');
+        }
+
+        User::destroy($ids);
+
+        return ApiResponse::success([], '删除成功');
     }
 }
