@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use App\Http\Responses\ApiResponse;
+use Illuminate\Auth\AuthenticationException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -26,12 +27,17 @@ return Application::configure(basePath: dirname(__DIR__))
                     return ApiResponse::error($e->validator->errors()->first());
                 }
 
-                // ✅ 2. HTTP异常（404 / 403 / 401）
+                // ✅ 2. 拦截 Token 无效 / 登录过期
+                if ($e instanceof AuthenticationException) {
+                    return ApiResponse::error('登录已过期或凭证无效，请重新登录', 403);
+                }
+
+                // ✅ 3. HTTP异常（404 / 403 / 401）
                 if ($e instanceof HttpExceptionInterface) {
                     return ApiResponse::error($e->getMessage(), $e->getStatusCode());
                 }
 
-                // ✅ 3. 其他异常（500）
+                // ✅ 4. 其他程序内部未知异常（500）
                 return ApiResponse::error($e->getMessage(), 500);
             }
         });

@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -17,23 +17,62 @@ class AuthController extends Controller
         $request->validate([
             'username' => 'required|string',
             'password' => 'required|string',
+            'env' => 'required|string',
         ], [
             'username.required' => '请输入用户名',
             'password.required' => '请输入密码',
+            'env.required' => '请输入环境',
         ]);
 
-        $credentials = $request->only('username', 'password');
 
-        if (!Auth::attempt($credentials)) {
+        $user = User::where('username', $request->username)->first();
+
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return ApiResponse::error('用户名或密码错误', 401);
         }
 
-        /** @var User $user */
-        $user = Auth::user();
-
         if ($user->status != 1) {
-            Auth::logout();
             return ApiResponse::error('用户已禁用', 401);
+        }
+
+        // 通过 role 关联拿到角色，再拿到角色拥有的权限，最后提取出 name 数组
+        $permissions = [];
+        if ($user->role) {
+            $permissions = $user->role->permissions()->pluck('name')->toArray();
+        }
+
+        // 生成 Token (plainTextToken 是纯文本字符串)
+        $token = $user->createToken($request->env)->plainTextToken;
+
+        return ApiResponse::success([
+            'user' => new UserResource($user),
+            'token' => $token,
+            'permissions' => $permissions,
+        ], '登录成功');
+    }
+
+    public function logout(Request $request)
+    {
+        $user = $request->user();
+
+        if ($user) {
+            // 删除当前 Token
+            $user->currentAccessToken()->delete();
+        }
+
+
+        // Auth::logout();
+
+
+        return ApiResponse::success([], '退出成功');
+    }
+
+    public function getUserInfo(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return ApiResponse::error('未登录', 401);
         }
 
         // 通过 role 关联拿到角色，再拿到角色拥有的权限，最后提取出 name 数组
@@ -45,26 +84,6 @@ class AuthController extends Controller
         return ApiResponse::success([
             'user' => new UserResource($user),
             'permissions' => $permissions,
-        ], '登录成功');
-    }
-
-    public function logout()
-    {
-        Auth::logout();
-
-        return ApiResponse::success([], '退出成功');
-    }
-
-    public function getUserInfo()
-    {
-        $user = Auth::user();
-
-        if (!$user) {
-            return ApiResponse::error('未登录', 401);
-        }
-
-        return ApiResponse::success([
-            'user' => new UserResource($user),
         ]);
     }
 }
