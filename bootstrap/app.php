@@ -7,6 +7,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -29,7 +30,16 @@ return Application::configure(basePath: dirname(__DIR__))
 
                 // ✅ 2. 拦截 Token 无效 / 登录过期
                 if ($e instanceof AuthenticationException) {
-                    return ApiResponse::error('登录已过期或凭证无效，请重新登录', 403);
+                    return ApiResponse::error('登录已过期或凭证无效，请重新登录', 401);
+                }
+
+                if ($e instanceof AccessDeniedHttpException) {
+                    $method = $request->method(); // 获取请求方式：GET, POST, DELETE 等
+                    $path = $request->path();     // 获取 API 路径：api/v1/role 等
+
+                    $message = "操作失败：您没有权限请求该接口 [{$method} /{$path}]";
+
+                    return ApiResponse::error($message, 403);
                 }
 
                 // ✅ 3. HTTP异常（404 / 403 / 401）
