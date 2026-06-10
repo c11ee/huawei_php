@@ -41,6 +41,7 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $data = [
+            'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
             'status' => $request->status,
@@ -79,6 +80,7 @@ class UserController extends Controller
         }
 
         $data = [
+            'name' => $request->name,
             'username' => $request->username,
             'phone' => $request->phone,
             'status' => $request->status,

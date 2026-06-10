@@ -24,7 +24,8 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'username' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
+            'username' => 'required|string|max:255|min:4',
             'phone' => [
                 'required',
                 'string',
@@ -50,6 +51,7 @@ class UserRequest extends FormRequest
     public function messages(): array
     {
         return [
+            'name.required' => '请输入姓名',
             'username.required' => '请输入用户名',
             'phone.required' => '请输入手机号',
             'phone.regex' => '手机号格式错误',

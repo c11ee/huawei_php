@@ -1,11 +1,16 @@
 <?php
 
+use App\Http\Controllers\Admin\v1\AuthController;
 use App\Http\Controllers\Admin\v1\PermissionController;
 use App\Http\Controllers\Admin\v1\RoleController;
 use App\Http\Controllers\Admin\v1\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
+    Route::post('v1/login', [AuthController::class, 'login']);
+    Route::post('v1/logout', [AuthController::class, 'logout']);
+    Route::get('v1/userinfo', [AuthController::class, 'getUserInfo']);
+
     Route::apiResource('v1/permissions', PermissionController::class)->parameters([
         // 在路由里映射
         'permissions' => 'id',

@@ -22,8 +22,6 @@ return new class extends Migration
             $table->integer('status')->after('phone')->default(0);
             // 添加字段角色ID
             $table->integer('role_id')->after('status')->default(1);
-            // 删除 name 字段
-            $table->dropColumn('name');
             // 删除 email 字段
             $table->dropColumn('email');
             // 删除 email_verified_at 字段
@@ -47,8 +45,6 @@ return new class extends Migration
             $table->dropColumn('status');
             // 删除字段角色ID
             $table->dropColumn('role_id');
-            // 添加字段 name
-            $table->string('name')->after('id');
             // 添加字段 email
             $table->string('email')->after('name');
             // 添加字段 email_verified_at
