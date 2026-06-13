@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin\v1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\PermissionRequest;
+use App\Http\Resources\PermissionResource;
 use App\Http\Responses\ApiResponse;
 use App\Traits\ModelDeleteTrait;
 use App\Traits\TreeTrait;
@@ -18,11 +19,16 @@ class PermissionController extends Controller
      */
     public function index()
     {
-        $query = Permission::query();
+        $permissions = Permission::all();
 
-        $list = $query->orderBy('sort', 'desc')->get()->map(fn($item) => $this->formatPermission($item))->all();
+        // 利用 Resource 过滤字段、格式化时间，并通过 resolve() 转为纯扁平数组
+        $formattedList = PermissionResource::collection($permissions)->resolve();
 
-        return ApiResponse::success($this->handleTreeData($list));
+        // 将格式化后的干净数组送入递归函数，构造树形数据
+        $treeData = $this->buildTree($formattedList);
+
+        // 完美返回
+        return ApiResponse::success($treeData);
     }
 
     /**
@@ -81,29 +87,6 @@ class PermissionController extends Controller
             'is_auth' => $validated['is_auth'],
             'remark' => $validated['remark'] ?? '',
             'parent_id' => $validated['parent_id'] ?? 0,
-        ];
-    }
-
-    /**
-     * 模型 → API 出参
-     */
-    private function formatPermission(Permission $item): array
-    {
-        return [
-            'id' => $item->id,
-            'key' => $item->name,
-            'name' => $item->label,
-            'path' => $item->path,
-            'icon' => $item->icon,
-            'type' => $item->type,
-            'sort' => $item->sort,
-            'is_auth' => $item->is_auth,
-            'remark' => $item->remark,
-            'parent_id' => $item->parent_id,
-            'created_at' => $this->serializeDate($item->created_at),
-            'updated_at' => $this->serializeDate($item->updated_at),
-            'created_at_ts' => $item->created_at?->timestamp ?? 0,
-            'updated_at_ts' => $item->updated_at?->timestamp ?? 0,
         ];
     }
 }

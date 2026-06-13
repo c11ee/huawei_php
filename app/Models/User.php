@@ -16,6 +16,8 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable, HasRoles, HasApiTokens;
 
+    protected $guard_name = 'sanctum';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -27,7 +29,7 @@ class User extends Authenticatable
         'phone',
         'avatar',
         'status',
-        'role_id',
+        'role_ids',
         'password',
     ];
 
@@ -52,11 +54,5 @@ class User extends Authenticatable
             // 'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    // 关联角色
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
     }
 }

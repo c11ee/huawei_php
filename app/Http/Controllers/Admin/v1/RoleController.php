@@ -57,7 +57,7 @@ class RoleController extends Controller
         // 创建角色
         $role = Role::create([
             'name' => $request->name,
-            'guard_name' => 'api',
+            'guard_name' => 'sanctum',
         ]);
 
         // 分配权限

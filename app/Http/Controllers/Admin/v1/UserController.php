@@ -17,7 +17,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         // 预加载 role 关联关系
-        $query = User::query()->with('role');
+        $query = User::query()->with('roles');
 
         // 搜索
         if ($request->username) {
@@ -45,11 +45,14 @@ class UserController extends Controller
             'username' => $request->username,
             'phone' => $request->phone,
             'status' => $request->status,
-            'role_id' => $request->role_id,
+            'role_ids' => $request->role_ids,
             'password' => bcrypt($request->password),
             'avatar' => $request->avatar ?? '',
         ];
-        User::create($data);
+        $user = User::create($data);
+
+        $roleIds = array_map('intval', explode(',', $request->role_ids));
+        $user->syncRoles($roleIds);
 
         return ApiResponse::success([], '添加成功');
     }
@@ -59,7 +62,7 @@ class UserController extends Controller
      */
     public function show(string $id)
     {
-        $user = User::with('role')->find($id);
+        $user = User::with('roles')->find($id);
 
         if (!$user) {
             return ApiResponse::error('用户不存在', 404);
@@ -73,7 +76,7 @@ class UserController extends Controller
      */
     public function update(UserRequest $request, string $id)
     {
-        $user = User::with('role')->find($id);
+        $user = User::with('roles')->find($id);
 
         if (!$user) {
             return ApiResponse::error('用户不存在', 404);
@@ -84,13 +87,15 @@ class UserController extends Controller
             'username' => $request->username,
             'phone' => $request->phone,
             'status' => $request->status,
-            'role_id' => $request->role_id,
+            'role_ids' => $request->role_ids,
             'avatar' => $request->avatar ?? '',
         ];
         if ($request->password) {
             $data['password'] = bcrypt($request->password);
         }
         $user->update($data);
+        $roleIds = array_map('intval', explode(',', $request->role_ids));
+        $user->syncRoles($roleIds);
 
         return ApiResponse::success([], '更新成功');
     }

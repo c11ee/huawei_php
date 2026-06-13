@@ -38,11 +38,11 @@ class UserRequest extends FormRequest
                     ),
             ],
             'status' => 'required|in:0,1',
-            'role_id' => 'required|integer|exists:roles,id',
+            'role_ids' => 'required|string',
             'password' => [
                 $this->isMethod('POST') ? 'required' : '',
                 'string',
-                'min:6',
+                'min:5',
                 'max:128',
             ],
         ];
@@ -57,9 +57,9 @@ class UserRequest extends FormRequest
             'phone.regex' => '手机号格式错误',
             'phone.unique' => '手机号已存在',
             'status.required' => '请选择状态',
-            'role_id.required' => '请选择角色',
+            'role_ids.required' => '请选择角色',
             'password.required' => '请输入密码',
-            'password.min' => '密码长度不能小于6位',
+            'password.min' => '密码长度不能小于5位',
             'password.max' => '密码长度不能大于128位',
         ];
     }
