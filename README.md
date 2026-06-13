@@ -31,3 +31,5 @@
 - 登录返回用户的权限 ✔
 - token ✔
 - 超管角色怎么加
+- 重新完善权限树 ✔
+- token 过期时间 (config/sanctum.php/expiration) 7天 ✔

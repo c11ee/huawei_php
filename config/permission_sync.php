@@ -29,6 +29,16 @@ return [
             'module' => 'system',
             'icon' => 'lock',
         ],
+        'role' => [
+            'label' => '角色管理',
+            'module' => 'system',
+            'icon' => 'lock',
+        ],
+        'user' => [
+            'label' => '用户管理',
+            'module' => 'system',
+            'icon' => 'lock',
+        ],
     ],
 
 ];
