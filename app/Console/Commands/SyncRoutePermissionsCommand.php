@@ -151,11 +151,13 @@ class SyncRoutePermissionsCommand extends Command
                 fn(Route $route) => ($this->parseRoute($route)['action'] ?? '') === 'index'
             );
 
+            $modulePath = trim((string) config("permission_sync.modules.{$moduleSlug}.path", ''), '/');
+
             $resourceRow = [
                 'name' => $resource,
                 'guard_name' => $guard,
                 'label' => $cfg['label'] ?? Str::headline($resource),
-                'path' => $this->frontendPath($indexRoute, $resource),
+                'path' => ($modulePath ? '/' . $modulePath : '') . $this->frontendPath($indexRoute, $resource) . '/index',
                 'icon' => $cfg['icon'] ?? '',
                 'type' => 1,
                 'sort' => $moduleSort * 100 + 10,
@@ -240,7 +242,7 @@ class SyncRoutePermissionsCommand extends Command
         $this->table(['key (name)', 'label', 'type', 'parent', 'path'], $rows);
     }
 
-    /** 前端路由 path：去 api 前缀、去 v1/v2 等版本段 */
+    /** 前端路由 path：去 api 前缀、去 v1/v2 等版本段、去 admin 前缀 */
     private function frontendPath(?Route $indexRoute, string $resource): string
     {
         if (! $indexRoute) {
@@ -248,7 +250,7 @@ class SyncRoutePermissionsCommand extends Command
         }
 
         $segments = collect(explode('/', $indexRoute->uri()))
-            ->reject(fn(string $segment) => $segment === '' || $segment === 'api')
+            ->reject(fn(string $segment) => $segment === '' || $segment === 'api' || $segment === 'admin')
             ->reject(fn(string $segment) => $this->isApiVersionSegment($segment))
             ->reject(fn(string $segment) => str_starts_with($segment, '{'))
             ->values();

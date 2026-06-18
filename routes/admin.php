@@ -12,10 +12,16 @@ Route::prefix('admin')->group(function () {
 
         Route::post('login', [AuthController::class, 'login']);
 
-        Route::middleware('auth:sanctum')->group(function () {
+        // 专门用于刷新 Token 的路由（只允许 Refresh Token）
+        Route::middleware([
+            'auth:sanctum',
+            'ability:refresh-token'
+        ])->post('refresh-token', [AuthController::class, 'refreshToken']);
+
+        Route::middleware(['auth:sanctum', 'ability:access-api'])->group(function () {
             // 写在 auth:sanctum middleware 里，才能获取到用户信息
             Route::post('logout', [AuthController::class, 'logout']);
-            Route::get('userinfo', [AuthController::class, 'getUserInfo']);
+
 
             // 权限管理
             Route::prefix('permissions')->group(function () {
@@ -35,6 +41,8 @@ Route::prefix('admin')->group(function () {
 
             // 用户管理
             Route::prefix('user')->group(function () {
+                Route::get('/info', [AuthController::class, 'getUserInfo']);
+                Route::get('/permissions', [AuthController::class, 'getPermissions']);
                 Route::get('/', [UserController::class, 'index'])->name('user.index')->middleware('can:user.index');
                 Route::post('/', [UserController::class, 'store'])->name('user.store')->middleware('can:user.store');
                 Route::put('/{id}', [UserController::class, 'update'])->name('user.update')->middleware('can:user.update');

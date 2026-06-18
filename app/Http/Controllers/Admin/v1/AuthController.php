@@ -40,26 +40,38 @@ class AuthController extends Controller
             return ApiResponse::error('用户已禁用', 401);
         }
 
-        // 通过 role 关联拿到角色，再拿到角色拥有的权限，最后提取出 name 数组
-        $separated = [
-            'menuPermissions' => [],
-            'buttonPermissions' => [],
-        ];
-        if ($user->hasRole('超级管理员')) {
-            $separated = $this->separatePermissions(Permission::all()->toArray());
-        } else if ($user->roles) {
-            $separated =  $this->separatePermissions($user->getAllPermissions()->toArray());
-        }
-
+        // 有效期较短的 token
+        $accessTokenInstance = $user->createToken('access_token', ['access-api'], now()->addDays(1));
         // 生成 Token (plainTextToken 是纯文本字符串)
-        $token = $user->createToken($request->env)->plainTextToken;
+        $accessToken = $accessTokenInstance->plainTextToken;
+
+        // 有效期较长的 token
+        $refreshTokenInstance = $user->createToken('refresh_token', ['refresh-token'], now()->addDays(7));
+        $refreshToken = $refreshTokenInstance->plainTextToken;
 
         return ApiResponse::success([
-            'token' => $token,
-            'user' => new UserResource($user),
-            'buttonPermissions' => $separated['buttonPermissions'],
-            'menuPermissions' => $separated['menuPermissions'],
+            'access_token' => $accessToken,
+            'refresh_token' => $refreshToken,
+            'expires_at' => now()->addDays(1)->timestamp,
         ], '登录成功');
+    }
+
+    public function refreshToken(Request $request)
+    {
+        $user = $request->user();
+
+        // 可选：删除当前使用的 refresh token（一次性使用）
+        $request->user()->currentAccessToken()->delete();
+
+        // 重新颁发新的短效 Access Token + 长效 Refresh Token
+        $newAccessToken = $user->createToken('access_token', ['access-api'], now()->addDays(1))->plainTextToken;
+        $newRefreshToken = $user->createToken('refresh_token', ['refresh-token'], now()->addDays(7))->plainTextToken;
+
+        return ApiResponse::success([
+            'access_token' => $newAccessToken,
+            'refresh_token' => $newRefreshToken,
+            'expires_at' => now()->addDays(1)->timestamp,
+        ]);
     }
 
     public function logout(Request $request)
@@ -86,6 +98,18 @@ class AuthController extends Controller
             return ApiResponse::error('未登录', 401);
         }
 
+        return ApiResponse::success(new UserResource($user));
+    }
+
+    /** 获取用户权限 */
+    public function getPermissions(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return ApiResponse::error('未登录', 401);
+        }
+
         // 通过 role 关联拿到角色，再拿到角色拥有的权限，最后提取出 name 数组
         $separated = [
             'menuPermissions' => [],
@@ -101,9 +125,8 @@ class AuthController extends Controller
         $separated = $this->separatePermissions($formattedPermissions);
 
         return ApiResponse::success([
-            'user' => new UserResource($user),
-            'buttonPermissions' => $separated['buttonPermissions'],
-            'menuPermissions' => $separated['menuPermissions'],
+            'button_permissions' => $separated['buttonPermissions'],
+            'menu_permissions' => $separated['menuPermissions'],
         ]);
     }
 

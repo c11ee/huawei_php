@@ -12,7 +12,7 @@ return [
         'system' => [
             'label' => '系统配置',
             'path' => '/system',
-            'icon' => 'setting',
+            'icon' => 'ri:settings-3-line',
             'sort' => 100,
         ],
         // 'business' => [
@@ -27,17 +27,17 @@ return [
         'permissions' => [
             'label' => '权限管理',
             'module' => 'system',
-            'icon' => 'lock',
+            'icon' => 'ep:menu',
         ],
         'role' => [
             'label' => '角色管理',
             'module' => 'system',
-            'icon' => 'lock',
+            'icon' => 'ri:admin-fill',
         ],
         'user' => [
             'label' => '用户管理',
             'module' => 'system',
-            'icon' => 'lock',
+            'icon' => 'ri:admin-line',
         ],
     ],
 
