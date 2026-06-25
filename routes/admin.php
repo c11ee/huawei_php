@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\v1\AuthController;
 use App\Http\Controllers\Admin\v1\PermissionController;
 use App\Http\Controllers\Admin\v1\RoleController;
+use App\Http\Controllers\Admin\v1\UserColumnPreferenceController;
 use App\Http\Controllers\Admin\v1\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +50,11 @@ Route::prefix('admin')->group(function () {
                 Route::delete('/{id}', [UserController::class, 'destroy'])->name('user.destroy')->middleware('can:user.destroy');
                 Route::get('/{id}', [UserController::class, 'show'])->name('user.show')->middleware('can:user.show');
             });
+        });
+
+        Route::prefix('common')->group(function () {
+            Route::get('/user-column-preference/{key}', [UserColumnPreferenceController::class, 'show'])->name('user-column-preference.show');
+            Route::post('/user-column-preference', [UserColumnPreferenceController::class, 'store'])->name('user-column-preference.store');
         });
     });
 });
