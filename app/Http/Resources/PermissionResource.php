@@ -22,7 +22,6 @@ class PermissionResource extends JsonResource
             'icon' => $this->icon,
             'type' => $this->type,
             'sort' => $this->sort,
-            'is_auth' => $this->is_auth,
             'remark' => $this->remark,
             'parent_id' => $this->parent_id,
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),

@@ -111,7 +111,6 @@ class SyncRoutePermissionsCommand extends Command
                 'icon' => $module['icon'] ?? '',
                 'type' => 1,
                 'sort' => $sort,
-                'is_auth' => 1,
                 'remark' => '模块',
                 'parent_id' => 0,
             ];
@@ -161,7 +160,6 @@ class SyncRoutePermissionsCommand extends Command
                 'icon' => $cfg['icon'] ?? '',
                 'type' => 1,
                 'sort' => $moduleSort * 100 + 10,
-                'is_auth' => 1,
                 'remark' => '资源菜单',
                 'parent_id' => 0,
             ];
@@ -181,7 +179,6 @@ class SyncRoutePermissionsCommand extends Command
                     'icon' => '',
                     'type' => 2,
                     'sort' => $resourceRow['sort'] + $actionSort,
-                    'is_auth' => 1,
                     'remark' => implode('|', $route->methods()),
                     'parent_id' => 0,
                 ];

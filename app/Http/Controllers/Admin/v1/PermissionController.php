@@ -36,8 +36,8 @@ class PermissionController extends Controller
      */
     public function store(PermissionRequest $request)
     {
-        Permission::create($this->toModelData($request->validated()));
-        return ApiResponse::success([], '添加成功');
+        $permission = Permission::create($this->toModelData($request->validated()));
+        return ApiResponse::success(new PermissionResource($permission), '添加成功');
     }
 
     /**
@@ -50,7 +50,7 @@ class PermissionController extends Controller
             return ApiResponse::error("数据不存在");
         }
         $permission->update($this->toModelData($request->validated()));
-        return ApiResponse::success([], '更新成功');
+        return ApiResponse::success(new PermissionResource($permission), '更新成功');
     }
 
     /**
@@ -84,7 +84,6 @@ class PermissionController extends Controller
             'icon' => $validated['icon'] ?? '',
             'type' => $validated['type'],
             'sort' => $validated['sort'],
-            'is_auth' => $validated['is_auth'],
             'remark' => $validated['remark'] ?? '',
             'parent_id' => $validated['parent_id'] ?? 0,
         ];
