@@ -21,8 +21,9 @@ class RoleController extends Controller
         $query = Role::query()->with('permissions');
 
         // 搜索
-        if ($request->name) {
-            $query->where('name', 'like', '%' . $request->name . '%');
+        if ($request->keyword) {
+            $query->where('name', 'like', '%' . $request->keyword . '%')
+                ->orWhere('description', 'like', '%' . $request->keyword . '%');
         }
 
         $list = $query->paginate(
@@ -33,8 +34,11 @@ class RoleController extends Controller
             return [
                 'id' => $item->id,
                 'name' => $item->name,
+                'status' => $item->status,
+                'description' => $item->description,
+                'user_count' => $item->users()->count(),
                 // 权限ID列表
-                'permissions' => $item->permissions->pluck('id'),
+                'permission_ids' => $item->permissions->pluck('id'),
                 'created_at' => $this->serializeDate($item->created_at),
                 'updated_at' => $this->serializeDate($item->updated_at),
                 'created_at_ts' => $item->created_at?->timestamp ?? 0,
@@ -54,19 +58,30 @@ class RoleController extends Controller
      */
     public function store(RoleRequest $request)
     {
-        // 创建角色
-        $role = Role::create([
-            'name' => $request->name,
-            'guard_name' => 'sanctum',
-        ]);
-
-        // 分配权限
-        if (!empty($request->permission_ids)) {
-            $permissions = Permission::whereIn('id', $request->permission_ids)->get();
-            $role->syncPermissions($permissions);
+        for ($i = 3; $i < 104; $i++) {
+            $role = Role::create([
+                'name' => '开发' . $i,
+                'status' => 1,
+                'description' => '描述',
+                'guard_name' => 'sanctum',
+            ]);
         }
 
-        return ApiResponse::success([], '添加成功');
+        // // 创建角色
+        // $role = Role::create([
+        //     'name' => $request->name,
+        //     'status' => $request->status,
+        //     'description' => $request->description,
+        //     'guard_name' => 'sanctum',
+        // ]);
+
+        // // 分配权限
+        // if (!empty($request->permission_ids)) {
+        //     $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+        //     $role->syncPermissions($permissions);
+        // }
+
+        // return ApiResponse::success([], '添加成功');
     }
 
     /**
@@ -81,6 +96,8 @@ class RoleController extends Controller
         }
         $role->update([
             'name' => $request->name,
+            'status' => $request->status,
+            'description' => $request->description,
         ]);
 
         // 分配权限
@@ -108,5 +125,22 @@ class RoleController extends Controller
         Role::destroy($ids);
 
         return ApiResponse::success([], '删除成功');
+    }
+
+    /**
+     * 编辑状态
+     */
+    public function updateStatus(Request $request, string $id)
+    {
+        // 更新角色状态
+        $role = Role::find($id);
+        if (!$role) {
+            return ApiResponse::error("数据不存在");
+        }
+        $role->update([
+            'status' => $request->status,
+        ]);
+
+        return ApiResponse::success([], '更新成功');
     }
 }

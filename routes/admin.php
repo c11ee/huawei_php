@@ -38,6 +38,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', [RoleController::class, 'store'])->name('role.store')->middleware('can:role.store');
                 Route::put('/{id}', [RoleController::class, 'update'])->name('role.update')->middleware('can:role.update');
                 Route::delete('/{id}', [RoleController::class, 'destroy'])->name('role.destroy')->middleware('can:role.destroy');
+                Route::put('/{id}/status', [RoleController::class, 'updateStatus'])->name('role.updateStatus')->middleware('can:role.updateStatus');
             });
 
             // 用户管理
