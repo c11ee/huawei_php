@@ -58,30 +58,21 @@ class RoleController extends Controller
      */
     public function store(RoleRequest $request)
     {
-        for ($i = 3; $i < 104; $i++) {
-            $role = Role::create([
-                'name' => '开发' . $i,
-                'status' => 1,
-                'description' => '描述',
-                'guard_name' => 'sanctum',
-            ]);
+        // 创建角色
+        $role = Role::create([
+            'name' => $request->name,
+            'status' => $request->status,
+            'description' => $request->description,
+            'guard_name' => 'sanctum',
+        ]);
+
+        // 分配权限
+        if (!empty($request->permission_ids)) {
+            $permissions = Permission::whereIn('id', $request->permission_ids)->get();
+            $role->syncPermissions($permissions);
         }
 
-        // // 创建角色
-        // $role = Role::create([
-        //     'name' => $request->name,
-        //     'status' => $request->status,
-        //     'description' => $request->description,
-        //     'guard_name' => 'sanctum',
-        // ]);
-
-        // // 分配权限
-        // if (!empty($request->permission_ids)) {
-        //     $permissions = Permission::whereIn('id', $request->permission_ids)->get();
-        //     $role->syncPermissions($permissions);
-        // }
-
-        // return ApiResponse::success([], '添加成功');
+        return ApiResponse::success([], '添加成功');
     }
 
     /**

@@ -50,6 +50,7 @@ Route::prefix('admin')->group(function () {
                 Route::put('/{id}', [UserController::class, 'update'])->name('user.update')->middleware('can:user.update');
                 Route::delete('/{id}', [UserController::class, 'destroy'])->name('user.destroy')->middleware('can:user.destroy');
                 Route::get('/{id}', [UserController::class, 'show'])->name('user.show')->middleware('can:user.show');
+                Route::put('/{id}/status', [UserController::class, 'updateStatus'])->name('user.updateStatus')->middleware('can:user.updateStatus');
             });
         });
 

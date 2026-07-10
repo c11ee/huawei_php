@@ -20,8 +20,9 @@ class UserController extends Controller
         $query = User::query()->with('roles');
 
         // 搜索
-        if ($request->username) {
-            $query->where('username', 'like', '%' . $request->username . '%');
+        if ($request->keyword) {
+            $query->where('name', 'like', '%' . $request->keyword . '%')
+                ->orWhere('username', 'like', '%' . $request->keyword . '%');
         }
 
         $list = $query->paginate(
@@ -41,9 +42,10 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $data = [
-            'name' => $request->name,
+            'name' => $request->nickname,
             'username' => $request->username,
-            'phone' => $request->phone,
+            'phone' => $request->phone ?? '',
+            'email' => $request->email ?? '',
             'status' => $request->status,
             'role_ids' => $request->role_ids,
             'password' => bcrypt($request->password),
@@ -83,8 +85,9 @@ class UserController extends Controller
         }
 
         $data = [
-            'name' => $request->name,
+            'name' => $request->nickname,
             'username' => $request->username,
+            'email' => $request->email,
             'phone' => $request->phone,
             'status' => $request->status,
             'role_ids' => $request->role_ids,
@@ -116,5 +119,22 @@ class UserController extends Controller
         User::destroy($ids);
 
         return ApiResponse::success([], '删除成功');
+    }
+
+    /**
+     * 编辑状态
+     */
+    public function updateStatus(Request $request, string $id)
+    {
+        // 更新用户状态
+        $user = User::find($id);
+        if (!$user) {
+            return ApiResponse::error("数据不存在");
+        }
+        $user->update([
+            'status' => $request->status,
+        ]);
+
+        return ApiResponse::success([], '更新成功');
     }
 }
