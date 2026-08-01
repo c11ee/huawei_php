@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class UserColumnPreference extends Model
+class UserColumnPreference extends BaseModel
 {
     protected $table = 'user_column_preference';
 

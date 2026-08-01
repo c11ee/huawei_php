@@ -2,17 +2,16 @@
 
 namespace App\Models;
 
-use DateTimeInterface;
 use Illuminate\Database\Eloquent\Model;
 
 class BaseModel extends Model
 {
-    /**
-     * 统一时间格式
-     */
-    protected function serializeDate(DateTimeInterface $date): string
+    protected function casts(): array
     {
-        return $date->format('Y-m-d H:i:s');
+        return [
+            'created_at' => 'datetime:Y-m-d H:i:s',
+            'updated_at' => 'datetime:Y-m-d H:i:s',
+        ];
     }
 
     /**

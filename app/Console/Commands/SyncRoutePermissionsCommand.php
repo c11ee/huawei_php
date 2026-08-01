@@ -19,11 +19,12 @@ class SyncRoutePermissionsCommand extends Command
     protected $description = '从路由生成三层权限树：固定模块 → 资源菜单 → 按钮';
 
     private const ACTION_LABELS = [
-        'index' => '列表',
-        'show' => '详情',
-        'store' => '创建',
-        'update' => '更新',
-        'destroy' => '删除',
+        'index'         => '列表',
+        'show'          => '详情',
+        'store'         => '创建',
+        'update'        => '更新',
+        'destroy'       => '删除',
+        'updateStatus'  => '更新状态',
     ];
 
     // 入口
@@ -71,17 +72,24 @@ class SyncRoutePermissionsCommand extends Command
                 continue;
             }
 
-            $resource = Permission::query()->updateOrCreate(
-                ['name' => $group['resource']['name'], 'guard_name' => $guard],
-                array_merge($group['resource'], ['parent_id' => $moduleId])
-            );
+            // 扁平化：资源名与模块 slug 相同时，跳过中间资源菜单，按钮直接挂在模块下
+            $isFlat = ($group['resource']['name'] === $group['module_slug']);
 
-            $total++;
+            if ($isFlat) {
+                $parentId = $moduleId;
+            } else {
+                $resourceModel = Permission::query()->updateOrCreate(
+                    ['name' => $group['resource']['name'], 'guard_name' => $guard],
+                    array_merge($group['resource'], ['parent_id' => $moduleId])
+                );
+                $parentId = $resourceModel->id;
+                $total++;
+            }
 
             foreach ($group['children'] as $child) {
                 Permission::query()->updateOrCreate(
                     ['name' => $child['name'], 'guard_name' => $guard],
-                    array_merge($child, ['parent_id' => $resource->id])
+                    array_merge($child, ['parent_id' => $parentId])
                 );
                 $total++;
             }
@@ -100,15 +108,20 @@ class SyncRoutePermissionsCommand extends Command
     {
         $rows = [];
 
-        foreach ((array) config('permission_sync.modules', []) as $slug => $module) {
-            $sort = (int) ($module['sort'] ?? 0);
+        foreach ((array) config('permission_sync.menus', []) as $slug => $menu) {
+            // 只取顶级菜单作为模块（parent 为 null）
+            if (array_key_exists('parent', $menu) && $menu['parent'] !== null) {
+                continue;
+            }
+
+            $sort = (int) ($menu['sort'] ?? 0);
             $rows[] = [
                 '_slug' => $slug,
                 'name' => 'module.' . $slug,
                 'guard_name' => $guard,
-                'label' => $module['label'],
-                'path' => $module['path'] ?? '',
-                'icon' => $module['icon'] ?? '',
+                'label' => $menu['label'],
+                'path' => $menu['path'] ?? '',
+                'icon' => $menu['icon'] ?? '',
                 'type' => 1,
                 'sort' => $sort,
                 'remark' => '模块',
@@ -125,32 +138,39 @@ class SyncRoutePermissionsCommand extends Command
      */
     private function buildResourceGroups(Collection $routes, string $guard): array
     {
-        $resourceConfig = config('permission_sync.resources', []);
+        $menusConfig = (array) config('permission_sync.menus', []);
         $grouped = $routes->groupBy(fn(Route $route) => $this->parseRoute($route)['resource']);
         $groups = [];
 
         foreach ($grouped as $resource => $resourceRoutes) {
-            if (! isset($resourceConfig[$resource])) {
-                $this->warn("资源 [{$resource}] 未在 config/permission_sync.php 的 resources 中配置，已跳过。");
+            if (! isset($menusConfig[$resource])) {
+                $this->warn("资源 [{$resource}] 未在 config/permission_sync.php 的 menus 中配置，已跳过。");
 
                 continue;
             }
 
-            $cfg = $resourceConfig[$resource];
-            $moduleSlug = $cfg['module'] ?? null;
+            $cfg = $menusConfig[$resource];
 
-            if (! $moduleSlug || ! config("permission_sync.modules.{$moduleSlug}")) {
-                $this->warn("资源 [{$resource}] 的 module [{$moduleSlug}] 无效，已跳过。");
+            // 确定模块 slug：如果资源有 parent，则归到 parent 模块；否则自身就是模块
+            $moduleSlug = null;
+            if (isset($cfg['parent']) && $cfg['parent'] !== null) {
+                $moduleSlug = $cfg['parent'];
+            } else {
+                $moduleSlug = $resource;
+            }
+
+            if (! isset($menusConfig[$moduleSlug])) {
+                $this->warn("资源 [{$resource}] 的 module [{$moduleSlug}] 在 menus 中未找到，已跳过。");
 
                 continue;
             }
 
-            $moduleSort = (int) config("permission_sync.modules.{$moduleSlug}.sort", 0);
+            $moduleSort = (int) ($menusConfig[$moduleSlug]['sort'] ?? 0);
             $indexRoute = $resourceRoutes->first(
                 fn(Route $route) => ($this->parseRoute($route)['action'] ?? '') === 'index'
             );
 
-            $modulePath = trim((string) config("permission_sync.modules.{$moduleSlug}.path", ''), '/');
+            $modulePath = trim((string) ($menusConfig[$moduleSlug]['path'] ?? ''), '/');
 
             $resourceRow = [
                 'name' => $resource,
@@ -166,15 +186,17 @@ class SyncRoutePermissionsCommand extends Command
 
             $children = [];
             $actionSort = 0;
+            $customLabels = (array) config('permission_sync.labels', []);
 
             foreach ($resourceRoutes as $route) {
                 $parsed = $this->parseRoute($route);
                 $actionSort++;
+                $permissionKey = $this->permissionKey($route);
 
                 $children[] = [
-                    'name' => $this->permissionKey($route),
+                    'name' => $permissionKey,
                     'guard_name' => $guard,
-                    'label' => $this->permissionLabel($parsed, $cfg['label'] ?? $resource),
+                    'label' => $customLabels[$permissionKey] ?? $this->permissionLabel($parsed, $cfg['label'] ?? $resource),
                     'path' => '',
                     'icon' => '',
                     'type' => 2,
@@ -216,21 +238,24 @@ class SyncRoutePermissionsCommand extends Command
         foreach ($groups as $group) {
             $moduleName = 'module.' . $group['module_slug'];
             $resource = $group['resource'];
+            $isFlat = ($resource['name'] === $group['module_slug']);
 
-            $rows[] = [
-                $resource['name'],
-                $resource['label'],
-                '菜单',
-                $moduleName,
-                $resource['path'],
-            ];
+            if (! $isFlat) {
+                $rows[] = [
+                    $resource['name'],
+                    $resource['label'],
+                    '菜单',
+                    $moduleName,
+                    $resource['path'],
+                ];
+            }
 
             foreach ($group['children'] as $child) {
                 $rows[] = [
                     $child['name'],
                     $child['label'],
                     '按钮',
-                    $resource['name'],
+                    $isFlat ? $moduleName : $resource['name'],
                     $child['path'] ?: '—',
                 ];
             }
@@ -274,6 +299,11 @@ class SyncRoutePermissionsCommand extends Command
         if ($name && str_contains($name, '.')) {
             [$resource, $action] = explode('.', $name, 2);
 
+            // 将文件夹路由映射到附件管理
+            if ($resource === 'folder') {
+                $resource = 'attachment';
+            }
+
             return ['resource' => $resource, 'action' => $action];
         }
 
@@ -283,8 +313,13 @@ class SyncRoutePermissionsCommand extends Command
             ->reject(fn(string $segment) => str_starts_with($segment, '{'))
             ->values();
 
+        $resource = $segments->last() ?? 'unknown';
+        if ($resource === 'folder') {
+            $resource = 'attachment';
+        }
+
         return [
-            'resource' => $segments->last() ?? 'unknown',
+            'resource' => $resource,
             'action' => strtolower($route->methods()[0] ?? 'get'),
         ];
     }
@@ -305,6 +340,11 @@ class SyncRoutePermissionsCommand extends Command
         }
 
         if (in_array($uri, ['up', 'storage/{path}'], true)) {
+            return false;
+        }
+
+        // 排除 common 前缀下的公共路由（如上传、用户偏好等）
+        if (Str::contains($uri, '/common/') || Str::startsWith($uri, 'common/')) {
             return false;
         }
 

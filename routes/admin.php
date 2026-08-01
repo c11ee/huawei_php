@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\v1\AttachmentController;
 use App\Http\Controllers\Admin\v1\AuthController;
+use App\Http\Controllers\Admin\v1\FolderController;
 use App\Http\Controllers\Admin\v1\PermissionController;
 use App\Http\Controllers\Admin\v1\RoleController;
 use App\Http\Controllers\Admin\v1\UserColumnPreferenceController;
@@ -52,11 +54,27 @@ Route::prefix('admin')->group(function () {
                 Route::get('/{id}', [UserController::class, 'show'])->name('user.show')->middleware('can:user.show');
                 Route::put('/{id}/status', [UserController::class, 'updateStatus'])->name('user.updateStatus')->middleware('can:user.updateStatus');
             });
+
+            // 文件夹管理
+            Route::prefix('folder')->group(function () {
+                Route::get('/tree', [FolderController::class, 'tree'])->name('folder.tree')->middleware('can:folder.tree');
+                Route::post('/', [FolderController::class, 'store'])->name('folder.store')->middleware('can:folder.store');
+                Route::delete('/{id}', [FolderController::class, 'destroy'])->name('folder.destroy')->middleware('can:folder.destroy');
+            });
+
+            // 附件管理
+            Route::prefix('attachment')->group(function () {
+                Route::get('/', [AttachmentController::class, 'index'])->name('attachment.index');
+                Route::delete('/', [AttachmentController::class, 'destroy'])->name('attachment.destroy');
+                Route::put('/restore', [AttachmentController::class, 'restore'])->name('attachment.restore');
+            });
         });
 
         Route::prefix('common')->group(function () {
             Route::get('/user-column-preference/{key}', [UserColumnPreferenceController::class, 'show'])->name('user-column-preference.show');
             Route::post('/user-column-preference', [UserColumnPreferenceController::class, 'store'])->name('user-column-preference.store');
+
+            Route::post('/upload', [AttachmentController::class, 'upload'])->name('attachment.upload');
         });
     });
 });
