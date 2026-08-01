@@ -29,7 +29,8 @@ class AttachmentController extends Controller
         // 获取当前目录下的子文件夹
         $folders = Folder::when(
             $isRecycleBin,
-            fn($query) => $query->where('recycle', 1)->where('parent_id', 0),
+            // 回收站根视图：文件夹本身被回收，且其父文件夹未被回收（或被直接回收在根目录）才在此展示
+            fn($query) => $query->where('recycle', 1)->whereNotIn('parent_id', Folder::where('recycle', 1)->pluck('id')),
             fn($query) => $query->where('recycle', 0)->where('parent_id', $folderId)
         )
             ->orderBy('sort')
@@ -39,7 +40,8 @@ class AttachmentController extends Controller
         // 获取当前目录下的附件
         $attachments = Attachment::when(
             $isRecycleBin,
-            fn($query) => $query->where('recycle', 1)->where('folder_id', 0),
+            // 回收站根视图：附件本身被回收，且其所在文件夹未被回收（或被直接回收在根目录）才在此展示
+            fn($query) => $query->where('recycle', 1)->whereNotIn('folder_id', Folder::where('recycle', 1)->pluck('id')),
             fn($query) => $query->where('recycle', 0)->where('folder_id', $folderId)
         )
             ->when($keyword, fn($query) => $query->where('original_name', 'like', "%{$keyword}%"))

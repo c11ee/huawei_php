@@ -21,6 +21,6 @@ class Folder extends BaseModel
 
     public function children()
     {
-        return $this->hasMany(Folder::class, 'parent_id', 'id')->with('children');
+        return $this->hasMany(Folder::class, 'parent_id', 'id')->where('recycle', 0)->with('children');
     }
 }
