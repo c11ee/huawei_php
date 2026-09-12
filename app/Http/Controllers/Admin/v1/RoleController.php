@@ -80,6 +80,11 @@ class RoleController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        // 不允许使用保留名称
+        if ($request->name === '超级管理员') {
+            return ApiResponse::error('角色名称不能为「超级管理员」');
+        }
+
         // 更新角色
         $role = Role::find($id);
         if (!$role) {

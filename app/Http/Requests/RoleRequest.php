@@ -23,7 +23,7 @@ class RoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|string|max:255|unique:roles,name',
+            'name' => 'required|string|max:255|unique:roles,name|not_in:超级管理员',
             'status' => 'required|integer|in:0,1',
             'description' => 'nullable|string|max:255',
             'permission_ids' => 'array',
@@ -38,6 +38,7 @@ class RoleRequest extends FormRequest
             'name.string' => '角色名称必须为字符串',
             'name.max' => '角色名称不能超过255个字符',
             'name.unique' => '角色名称已存在',
+            'name.not_in' => '角色名称不能为「超级管理员」',
             'status.required' => '状态不能为空',
             'status.integer' => '状态必须为整数',
             'status.in' => '状态只能为0或1',

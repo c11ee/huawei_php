@@ -52,5 +52,7 @@ return [
     'labels' => [
         'folder.tree'   => '文件树',
         'folder.store'  => '文件添加',
+        'folder.destroy'  => '文件删除',
+        'attachment.restore'  => '文件还原',
     ],
 ];
