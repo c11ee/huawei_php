@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\v1\AttachmentController;
 use App\Http\Controllers\Admin\v1\AuthController;
+use App\Http\Controllers\Admin\V1\BrandController;
 use App\Http\Controllers\Admin\v1\CategoryController;
 use App\Http\Controllers\Admin\v1\FolderController;
 use App\Http\Controllers\Admin\v1\PermissionController;
@@ -76,6 +77,15 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', [CategoryController::class, 'store'])->name('category.store')->middleware('can:category.store');
                 Route::put('/{id}', [CategoryController::class, 'update'])->name('category.update')->middleware('can:category.update');
                 Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('category.destroy')->middleware('can:category.destroy');
+            });
+
+            // 品牌管理
+            Route::prefix('brand')->group(function () {
+                Route::get('/', [BrandController::class, 'index'])->name('brand.index')->middleware('can:brand.index');
+                Route::post('/', [BrandController::class, 'store'])->name('brand.store')->middleware('can:brand.store');
+                Route::put('/status', [BrandController::class, 'updateStatus'])->name('brand.updateStatus')->middleware('can:brand.updateStatus');
+                Route::put('/{id}', [BrandController::class, 'update'])->name('brand.update')->middleware('can:brand.update');
+                Route::delete('/{id}', [BrandController::class, 'destroy'])->name('brand.destroy')->middleware('can:brand.destroy');
             });
         });
 

@@ -12,11 +12,25 @@ return [
             'sort' => 90,
             'parent' => null,
         ],
+        'brand' => [
+            'label' => '品牌管理',
+            'icon' => 'ant-design:trademark-outlined',
+            'sort' => 95,
+            'parent' => 'product',
+        ],
         'category' => [
             'label' => '分类管理',
             'icon' => 'ri:apps-2-line',
-            'sort' => 91,
+            'sort' => 100,
             'parent' => 'product',
+        ],
+
+        'attachment' => [
+            'label' => '附件管理',
+            'path' => '/attachment',
+            'icon' => 'ri:folder-2-line',
+            'sort' => 95,
+            'parent' => null,
         ],
 
         'system' => [
@@ -45,14 +59,6 @@ return [
             'icon' => 'ri:admin-line',
             'sort' => 130,
             'parent' => 'system',
-        ],
-
-        'attachment' => [
-            'label' => '附件管理',
-            'path' => '/attachment',
-            'icon' => 'ri:folder-2-line',
-            'sort' => 200,
-            'parent' => null,
         ],
     ],
 

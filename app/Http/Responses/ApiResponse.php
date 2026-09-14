@@ -11,11 +11,19 @@ class ApiResponse
      */
     public static function success($data = [], string $msg = 'ok')
     {
-        return response()->json([
+        $payload = [
             'code' => 200,
             'msg' => $msg,
             'data' => $data,
-        ]);
+        ];
+
+        if (is_array($data) && array_key_exists('total', $data)) {
+            $payload = array_merge($payload, $data);
+        } else {
+            $payload['data'] = $data;
+        }
+
+        return response()->json($payload);
     }
 
     /**
