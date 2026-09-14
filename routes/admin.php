@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\v1\AttachmentController;
 use App\Http\Controllers\Admin\v1\AuthController;
+use App\Http\Controllers\Admin\v1\CategoryController;
 use App\Http\Controllers\Admin\v1\FolderController;
 use App\Http\Controllers\Admin\v1\PermissionController;
 use App\Http\Controllers\Admin\v1\RoleController;
@@ -67,6 +68,14 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [AttachmentController::class, 'index'])->name('attachment.index');
                 Route::delete('/', [AttachmentController::class, 'destroy'])->name('attachment.destroy');
                 Route::put('/restore', [AttachmentController::class, 'restore'])->name('attachment.restore');
+            });
+
+            // 分类管理
+            Route::prefix('category')->group(function () {
+                Route::get('/', [CategoryController::class, 'index'])->name('category.index')->middleware('can:category.index');
+                Route::post('/', [CategoryController::class, 'store'])->name('category.store')->middleware('can:category.store');
+                Route::put('/{id}', [CategoryController::class, 'update'])->name('category.update')->middleware('can:category.update');
+                Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('category.destroy')->middleware('can:category.destroy');
             });
         });
 

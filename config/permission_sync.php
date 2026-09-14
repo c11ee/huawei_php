@@ -5,6 +5,20 @@
  */
 return [
     'menus' => [
+        'product' => [
+            'label' => '商品管理',
+            'path' => '/product',
+            'icon' => 'ep:goods',
+            'sort' => 90,
+            'parent' => null,
+        ],
+        'category' => [
+            'label' => '分类管理',
+            'icon' => 'ri:apps-2-line',
+            'sort' => 91,
+            'parent' => 'product',
+        ],
+
         'system' => [
             'label' => '系统配置',
             'path' => '/system',

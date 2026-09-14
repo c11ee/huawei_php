@@ -22,6 +22,8 @@ class AttachmentController extends Controller
     {
         $folderId = $request->input('folder_id', 0);
         $keyword = $request->input('keyword', '');
+        // 仅筛选图片（mime_type 为 image/*）
+        $onlyImage = (bool) $request->input('only_image', 0);
 
         // 回收站：folder_id = -1 时仅展示 recycle = 1 的数据
         $isRecycleBin = (int) $folderId === -1;
@@ -45,6 +47,7 @@ class AttachmentController extends Controller
             fn($query) => $query->where('recycle', 0)->where('folder_id', $folderId)
         )
             ->when($keyword, fn($query) => $query->where('original_name', 'like', "%{$keyword}%"))
+            ->when($onlyImage, fn($query) => $query->where('mime_type', 'like', 'image/%'))
             ->get()
             ->each(fn($file) => $file->type = 'file');
 

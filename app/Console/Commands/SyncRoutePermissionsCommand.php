@@ -13,7 +13,7 @@ class SyncRoutePermissionsCommand extends Command
 {
     protected $signature = 'permissions:sync-routes
                             {--guard=sanctum : Spatie guard_name}
-                            {--prefix=api : 只同步 URI 以此前缀开头的路由}
+                            {--prefix=admin : 只同步 URI 以此前缀开头的路由}
                             {--dry-run : 仅预览，不写入数据库}';
 
     protected $description = '从路由生成三层权限树：固定模块 → 资源菜单 → 按钮';
