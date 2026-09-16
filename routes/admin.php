@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\V1\BrandController;
 use App\Http\Controllers\Admin\v1\CategoryController;
 use App\Http\Controllers\Admin\v1\FolderController;
 use App\Http\Controllers\Admin\v1\PermissionController;
+use App\Http\Controllers\Admin\V1\ProductSpecTemplateController;
 use App\Http\Controllers\Admin\v1\RoleController;
 use App\Http\Controllers\Admin\v1\UserColumnPreferenceController;
 use App\Http\Controllers\Admin\v1\UserController;
@@ -48,7 +49,7 @@ Route::prefix('admin')->group(function () {
             // 用户管理
             Route::prefix('user')->group(function () {
                 Route::get('/info', [AuthController::class, 'getUserInfo']);
-                Route::get('/permissions', [AuthController::class, 'getPermissions']);
+                Route::get('/permissions', [AuthController::class, 'getPermissions'])->name('user.permissions')->middleware('can:user.permissions');
                 Route::get('/', [UserController::class, 'index'])->name('user.index')->middleware('can:user.index');
                 Route::post('/', [UserController::class, 'store'])->name('user.store')->middleware('can:user.store');
                 Route::put('/{id}', [UserController::class, 'update'])->name('user.update')->middleware('can:user.update');
@@ -86,6 +87,15 @@ Route::prefix('admin')->group(function () {
                 Route::put('/status', [BrandController::class, 'updateStatus'])->name('brand.updateStatus')->middleware('can:brand.updateStatus');
                 Route::put('/{id}', [BrandController::class, 'update'])->name('brand.update')->middleware('can:brand.update');
                 Route::delete('/{id}', [BrandController::class, 'destroy'])->name('brand.destroy')->middleware('can:brand.destroy');
+            });
+
+            // 规格模板管理
+            Route::prefix('spec-template')->group(function () {
+                Route::get('/', [ProductSpecTemplateController::class, 'index'])->name('spec-template.index')->middleware('can:spec-template.index');
+                Route::post('/', [ProductSpecTemplateController::class, 'store'])->name('spec-template.store')->middleware('can:spec-template.store');
+                Route::put('/status', [ProductSpecTemplateController::class, 'updateStatus'])->name('spec-template.updateStatus')->middleware('can:spec-template.updateStatus');
+                Route::put('/{id}', [ProductSpecTemplateController::class, 'update'])->name('spec-template.update')->middleware('can:spec-template.update');
+                Route::delete('/{id}', [ProductSpecTemplateController::class, 'destroy'])->name('spec-template.destroy')->middleware('can:spec-template.destroy');
             });
         });
 

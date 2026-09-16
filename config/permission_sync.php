@@ -24,6 +24,12 @@ return [
             'sort' => 100,
             'parent' => 'product',
         ],
+        'spec-template' => [
+            'label' => '商品规格',
+            'icon' => 'ri:stack-line',
+            'sort' => 105,
+            'parent' => 'product',
+        ],
 
         'attachment' => [
             'label' => '附件管理',
@@ -74,5 +80,6 @@ return [
         'folder.store'  => '文件添加',
         'folder.destroy'  => '文件删除',
         'attachment.restore'  => '文件还原',
+        'user.permissions'  => '用户权限',
     ],
 ];
