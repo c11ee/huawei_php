@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('brand', function (Blueprint $table) {
+        Schema::create('product_brand', function (Blueprint $table) {
             $table->id();
             $table->string('name')->default('')->comment('品牌名称');
             $table->string('logo')->default('')->comment('品牌logo');
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('brand');
+        Schema::dropIfExists('product_brand');
     }
 };

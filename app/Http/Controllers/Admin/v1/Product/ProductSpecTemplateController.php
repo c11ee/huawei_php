@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Admin\V1;
+namespace App\Http\Controllers\Admin\v1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
-use App\Models\ProductSpecTemplate;
+use App\Models\Product\ProductSpecTemplate;
 use Illuminate\Http\Request;
 
 class ProductSpecTemplateController extends Controller

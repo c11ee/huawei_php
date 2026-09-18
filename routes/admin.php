@@ -1,15 +1,15 @@
 <?php
 
-use App\Http\Controllers\Admin\v1\AttachmentController;
-use App\Http\Controllers\Admin\v1\AuthController;
-use App\Http\Controllers\Admin\V1\BrandController;
-use App\Http\Controllers\Admin\v1\CategoryController;
-use App\Http\Controllers\Admin\v1\FolderController;
-use App\Http\Controllers\Admin\v1\PermissionController;
-use App\Http\Controllers\Admin\V1\ProductSpecTemplateController;
-use App\Http\Controllers\Admin\v1\RoleController;
-use App\Http\Controllers\Admin\v1\UserColumnPreferenceController;
-use App\Http\Controllers\Admin\v1\UserController;
+use App\Http\Controllers\Admin\v1\Attachment\AttachmentController;
+use App\Http\Controllers\Admin\v1\Auth\AuthController;
+use App\Http\Controllers\Admin\V1\Product\BrandController;
+use App\Http\Controllers\Admin\v1\Product\CategoryController;
+use App\Http\Controllers\Admin\v1\Attachment\FolderController;
+use App\Http\Controllers\Admin\v1\System\PermissionController;
+use App\Http\Controllers\Admin\V1\Product\ProductSpecTemplateController;
+use App\Http\Controllers\Admin\v1\System\RoleController;
+use App\Http\Controllers\Admin\v1\System\UserColumnPreferenceController;
+use App\Http\Controllers\Admin\v1\System\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {

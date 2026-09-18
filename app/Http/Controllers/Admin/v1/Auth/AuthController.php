@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin\v1;
+namespace App\Http\Controllers\Admin\v1\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
-use App\Models\User;
+use App\Models\System\User;
 use App\Traits\TreeTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;

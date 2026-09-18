@@ -13,8 +13,8 @@ class ImportCategoriesCommand extends Command
 
     public function handle(): int
     {
-        if (DB::table('category')->exists() && ! $this->option('force')) {
-            if (! $this->confirm('category 表已有数据，是否清空后重新导入？', false)) {
+        if (DB::table('product_category')->exists() && ! $this->option('force')) {
+            if (! $this->confirm('product_category 表已有数据，是否清空后重新导入？', false)) {
                 $this->warn('已取消，未做任何修改。');
 
                 return self::SUCCESS;
@@ -25,7 +25,7 @@ class ImportCategoriesCommand extends Command
         $now = now();
 
         // 清空并重置自增，使 id 从默认规则重新生成
-        DB::table('category')->truncate();
+        DB::table('product_category')->truncate();
         $this->insertWithRemappedParents($categories, $now);
 
         $this->info(sprintf('分类导入完成，共 %d 条。', count($categories)));
@@ -55,7 +55,7 @@ class ImportCategoriesCommand extends Command
                     continue;
                 }
 
-                $newId = DB::table('category')->insertGetId([
+                $newId = DB::table('product_category')->insertGetId([
                     'category_name' => $item['category_name'],
                     'parent_id' => $sourceParentId === 0 ? 0 : $idMap[$sourceParentId],
                     'sort' => $item['sort'],

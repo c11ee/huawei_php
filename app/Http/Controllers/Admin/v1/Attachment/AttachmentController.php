@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin\v1;
+namespace App\Http\Controllers\Admin\v1\Attachment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\v1\Traits\RecycleFolderTrait;
 use App\Http\Responses\ApiResponse;
-use App\Models\Attachment;
-use App\Models\Folder;
+use App\Models\Attachment\Attachment;
+use App\Models\Attachment\Folder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 

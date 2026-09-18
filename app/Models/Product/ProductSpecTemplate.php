@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Product;
 
+use App\Models\BaseModel;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class ProductSpecTemplate extends BaseModel

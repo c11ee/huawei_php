@@ -2,8 +2,6 @@
 
 namespace App\Http\Responses;
 
-use DateTimeInterface;
-
 class ApiResponse
 {
     /**

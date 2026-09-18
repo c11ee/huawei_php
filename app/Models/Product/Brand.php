@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Product;
 
+use App\Models\BaseModel;
 
 class Brand extends BaseModel
 {
     protected $table = 'brand';
-    
+
     /**
      * The attributes that are mass assignable.
      *

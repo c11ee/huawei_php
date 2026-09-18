@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Admin\V1;
+namespace App\Http\Controllers\Admin\v1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
-use App\Models\Brand;
+use App\Models\Product\Brand;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller

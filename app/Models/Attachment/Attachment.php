@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Attachment;
 
+use App\Models\BaseModel;
 
 class Attachment extends BaseModel
 {

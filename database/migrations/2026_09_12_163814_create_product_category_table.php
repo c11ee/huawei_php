@@ -11,10 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('category', function (Blueprint $table) {
+        Schema::create('product_category', function (Blueprint $table) {
             $table->id();
             $table->string('category_name', 100)->default('')->comment('分类名称');
             $table->bigInteger('parent_id')->default(0)->comment('父分类ID');
+            $table->string('icon')->default('')->comment('图标');
+            $table->integer('status')->default(0)->comment('状态');
             $table->integer('sort')->default(0)->comment('排序字段');
             $table->timestamps();
 
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category');
+        Schema::dropIfExists('product_category');
     }
 };

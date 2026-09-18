@@ -1,6 +1,8 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Product;
+
+use App\Models\BaseModel;
 
 class Category extends BaseModel
 {

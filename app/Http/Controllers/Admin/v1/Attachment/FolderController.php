@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Admin\v1;
+namespace App\Http\Controllers\Admin\v1\Attachment;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Admin\v1\Traits\RecycleFolderTrait;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
-use App\Models\Folder;
+use App\Models\Attachment\Folder;
 
 class FolderController extends Controller
 {

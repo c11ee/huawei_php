@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\Admin\v1;
+namespace App\Http\Controllers\Admin\v1\System;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
-use App\Models\UserColumnPreference;
+use App\Models\System\UserColumnPreference;
 use Illuminate\Http\Request;
 
 class UserColumnPreferenceController extends Controller
