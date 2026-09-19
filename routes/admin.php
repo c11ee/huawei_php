@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\V1\Product\ProductSpecTemplateController;
 use App\Http\Controllers\Admin\v1\System\RoleController;
 use App\Http\Controllers\Admin\v1\System\UserColumnPreferenceController;
 use App\Http\Controllers\Admin\v1\System\UserController;
+use App\Http\Controllers\Admin\v1\Product\ProductController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
@@ -70,6 +71,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [AttachmentController::class, 'index'])->name('attachment.index');
                 Route::delete('/', [AttachmentController::class, 'destroy'])->name('attachment.destroy');
                 Route::put('/restore', [AttachmentController::class, 'restore'])->name('attachment.restore');
+                Route::put('/update-folder-id', [AttachmentController::class, 'updateFolderId'])->name('attachment.updateFolderId');
             });
 
             // 分类管理
@@ -96,6 +98,16 @@ Route::prefix('admin')->group(function () {
                 Route::put('/status', [ProductSpecTemplateController::class, 'updateStatus'])->name('spec-template.updateStatus')->middleware('can:spec-template.updateStatus');
                 Route::put('/{id}', [ProductSpecTemplateController::class, 'update'])->name('spec-template.update')->middleware('can:spec-template.update');
                 Route::delete('/{id}', [ProductSpecTemplateController::class, 'destroy'])->name('spec-template.destroy')->middleware('can:spec-template.destroy');
+            });
+
+            // 产品管理
+            Route::prefix('product')->group(function () {
+                Route::get('/', [ProductController::class, 'index'])->name('product.index')->middleware('can:product.index');
+                Route::post('/', [ProductController::class, 'store'])->name('product.store')->middleware('can:product.store');
+                Route::put('/{id}', [ProductController::class, 'update'])->name('product.update')->middleware('can:product.update');
+                Route::delete('/{id}', [ProductController::class, 'destroy'])->name('product.destroy')->middleware('can:product.destroy');
+                Route::get('/{id}', [ProductController::class, 'show'])->name('product.show')->middleware('can:product.show');
+                Route::put('/status', [ProductController::class, 'updateStatus'])->name('product.updateStatus')->middleware('can:product.updateStatus');
             });
         });
 

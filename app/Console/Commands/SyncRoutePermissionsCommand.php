@@ -114,7 +114,6 @@ class SyncRoutePermissionsCommand extends Command
                 continue;
             }
 
-            $sort = (int) ($menu['sort'] ?? 0);
             $rows[] = [
                 '_slug' => $slug,
                 'name' => 'module.' . $slug,
@@ -123,7 +122,7 @@ class SyncRoutePermissionsCommand extends Command
                 'path' => $menu['path'] ?? '',
                 'icon' => $menu['icon'] ?? '',
                 'type' => 1,
-                'sort' => $sort,
+                'sort' => min((int) ($menu['sort'] ?? 0), 9999),
                 'remark' => '模块',
                 'parent_id' => 0,
             ];
@@ -141,22 +140,27 @@ class SyncRoutePermissionsCommand extends Command
         $menusConfig = (array) config('permission_sync.menus', []);
         $grouped = $routes->groupBy(fn(Route $route) => $this->parseRoute($route)['resource']);
         $groups = [];
+        // 每个模块下的排序游标：同级依次 +5，且不超过 9999
+        $cursors = [];
 
         foreach ($grouped as $resource => $resourceRoutes) {
-            if (! isset($menusConfig[$resource])) {
+            // 配置了 prefix 的菜单优先按 prefix 匹配路由资源，否则用菜单 key 匹配
+            $menuKey = $this->resolveMenuKey($menusConfig, $resource);
+
+            if ($menuKey === null) {
                 $this->warn("资源 [{$resource}] 未在 config/permission_sync.php 的 menus 中配置，已跳过。");
 
                 continue;
             }
 
-            $cfg = $menusConfig[$resource];
+            $cfg = $menusConfig[$menuKey];
 
             // 确定模块 slug：如果资源有 parent，则归到 parent 模块；否则自身就是模块
             $moduleSlug = null;
             if (isset($cfg['parent']) && $cfg['parent'] !== null) {
                 $moduleSlug = $cfg['parent'];
             } else {
-                $moduleSlug = $resource;
+                $moduleSlug = $menuKey;
             }
 
             if (! isset($menusConfig[$moduleSlug])) {
@@ -172,26 +176,39 @@ class SyncRoutePermissionsCommand extends Command
 
             $modulePath = trim((string) ($menusConfig[$moduleSlug]['path'] ?? ''), '/');
 
+            // 资源菜单与模块同名时，跳过中间层，按钮直接挂在模块下
+            $isFlat = ($menuKey === $moduleSlug);
+            $cursors[$moduleSlug] = min($cursors[$moduleSlug] ?? $moduleSort, 9999);
+
+            if (! $isFlat) {
+                $cursors[$moduleSlug] = min($cursors[$moduleSlug] + 5, 9999);
+            }
+
+            // 配置了 prefix 时以前缀作为前端路径，不再从路由推导
+            $prefix = trim((string) ($cfg['prefix'] ?? ''), '/');
+            $resourcePath = $prefix !== ''
+                ? '/' . $prefix
+                : ($modulePath ? '/' . $modulePath : '') . $this->frontendPath($indexRoute, $resource);
+
             $resourceRow = [
-                'name' => $resource,
+                'name' => $menuKey,
                 'guard_name' => $guard,
-                'label' => $cfg['label'] ?? Str::headline($resource),
-                'path' => ($modulePath ? '/' . $modulePath : '') . $this->frontendPath($indexRoute, $resource) . '/index',
+                'label' => $cfg['label'] ?? Str::headline($menuKey),
+                'path' => $resourcePath . '/index',
                 'icon' => $cfg['icon'] ?? '',
                 'type' => 1,
-                'sort' => $moduleSort * 100 + 10,
+                'sort' => $cursors[$moduleSlug],
                 'remark' => '资源菜单',
                 'parent_id' => 0,
             ];
 
             $children = [];
-            $actionSort = 0;
             $customLabels = (array) config('permission_sync.labels', []);
 
             foreach ($resourceRoutes as $route) {
                 $parsed = $this->parseRoute($route);
-                $actionSort++;
                 $permissionKey = $this->permissionKey($route);
+                $cursors[$moduleSlug] = min($cursors[$moduleSlug] + 5, 9999);
 
                 $children[] = [
                     'name' => $permissionKey,
@@ -200,7 +217,7 @@ class SyncRoutePermissionsCommand extends Command
                     'path' => '',
                     'icon' => '',
                     'type' => 2,
-                    'sort' => $resourceRow['sort'] + $actionSort,
+                    'sort' => $cursors[$moduleSlug],
                     'remark' => implode('|', $route->methods()),
                     'parent_id' => 0,
                 ];
@@ -214,6 +231,25 @@ class SyncRoutePermissionsCommand extends Command
         }
 
         return $groups;
+    }
+
+    /**
+     * 匹配路由资源对应的菜单 key
+     * 指定了 prefix 的菜单按 prefix 匹配，其余按资源名匹配
+     *
+     * @param  array<string, mixed>  $menusConfig
+     */
+    private function resolveMenuKey(array $menusConfig, string $resource): ?string
+    {
+        foreach ($menusConfig as $key => $menu) {
+            $prefix = trim((string) ($menu['prefix'] ?? ''), '/');
+
+            if ($prefix !== '' && $prefix === $resource) {
+                return $key;
+            }
+        }
+
+        return isset($menusConfig[$resource]) ? $resource : null;
     }
 
     /**

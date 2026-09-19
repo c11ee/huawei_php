@@ -4,9 +4,9 @@ namespace App\Models\Product;
 
 use App\Models\BaseModel;
 
-class Category extends BaseModel
+class ProductCategory extends BaseModel
 {
-    protected $table = 'category';
+    protected $table = 'product_category';
 
     /**
      * The attributes that are mass assignable.
@@ -23,7 +23,7 @@ class Category extends BaseModel
 
     public function children()
     {
-        return $this->hasMany(Category::class, 'parent_id', 'id')
+        return $this->hasMany(ProductCategory::class, 'parent_id', 'id')
             ->orderBy('sort')
             ->with('children');
     }

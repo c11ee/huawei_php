@@ -15,11 +15,16 @@ return new class extends Migration
             $table->id();
             $table->string('spu_code', 64)->comment('SPU编码');
             $table->string('product_name', 128)->comment('产品名称');
+            $table->string('product_description', 255)->comment('产品描述');
             $table->integer('brand_id')->comment('品牌ID');
+            $table->json('slider_images')->nullable()->comment('轮播图');
+            $table->string('video_url', 255)->comment('视频URL');
+            $table->string('video_cover_url', 255)->comment('视频封面URL');
             $table->integer('spec_template_id')->comment('规格模板ID');
             $table->integer('default_sku_id')->comment('默认SKU ID');
             $table->decimal('default_sku_sale_price', 12, 2)->comment('默认SKU销售价格');
             $table->integer('default_sku_stock')->comment('默认SKU库存');
+            $table->string('default_sku_image_url', 255)->comment('默认SKU主图');
             $table->decimal('min_sale_price', 12, 2)->comment('最小销售价格');
             $table->decimal('max_sale_price', 12, 2)->comment('最大销售价格');
             $table->integer('total_stock')->comment('总库存');

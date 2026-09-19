@@ -30,6 +30,14 @@ return [
             'sort' => 105,
             'parent' => 'product',
         ],
+        'product-list' => [
+            'label' => '商品列表',
+            'icon' => 'ri:shopping-bag-3-line',
+            'sort' => 110,
+            // 商品列表路由前缀为 product，匹配 product.index 权限
+            'prefix' => 'product',
+            'parent' => 'product',
+        ],
 
         'attachment' => [
             'label' => '附件管理',
@@ -81,5 +89,7 @@ return [
         'folder.destroy'  => '文件删除',
         'attachment.restore'  => '文件还原',
         'user.permissions'  => '用户权限',
+        'attachment.updateFolderId'  => '批量修改文件夹绑定',
+        'product.index'  => '商品列表',
     ],
 ];

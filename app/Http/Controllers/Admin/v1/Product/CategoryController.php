@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\v1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
-use App\Models\Product\Category;
+use App\Models\Product\ProductCategory;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
@@ -14,7 +14,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $tree = Category::where('parent_id', 0)
+        $tree = ProductCategory::where('parent_id', 0)
             ->with('children')
             ->orderBy('sort')
             ->get();
@@ -29,11 +29,11 @@ class CategoryController extends Controller
     {
         $data = $this->validateData($request);
 
-        if ($data['parent_id'] > 0 && ! Category::whereKey($data['parent_id'])->exists()) {
+        if ($data['parent_id'] > 0 && ! ProductCategory::whereKey($data['parent_id'])->exists()) {
             return ApiResponse::error('父分类不存在');
         }
 
-        Category::create($data);
+        ProductCategory::create($data);
 
         return ApiResponse::success([], '添加成功');
     }
@@ -43,7 +43,7 @@ class CategoryController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $category = Category::find($id);
+        $category = ProductCategory::find($id);
         if (! $category) {
             return ApiResponse::error('数据不存在');
         }
@@ -51,7 +51,7 @@ class CategoryController extends Controller
         $data = $this->validateData($request);
 
         if ($data['parent_id'] > 0) {
-            if (! Category::whereKey($data['parent_id'])->exists()) {
+            if (! ProductCategory::whereKey($data['parent_id'])->exists()) {
                 return ApiResponse::error('父分类不存在');
             }
 
@@ -73,7 +73,7 @@ class CategoryController extends Controller
     {
         $ids = array_values(array_filter(
             array_map('intval', explode(',', $id)),
-            fn ($v) => $v > 0
+            fn($v) => $v > 0
         ));
 
         if ($ids === []) {
@@ -85,7 +85,7 @@ class CategoryController extends Controller
             $deleteIds = array_merge($deleteIds, $this->descendantIds($categoryId));
         }
 
-        Category::whereIn('id', array_values(array_unique($deleteIds)))->delete();
+        ProductCategory::whereIn('id', array_values(array_unique($deleteIds)))->delete();
 
         return ApiResponse::success([], '删除成功');
     }
@@ -129,9 +129,9 @@ class CategoryController extends Controller
         $ids = [$categoryId];
 
         while (true) {
-            $childIds = Category::whereIn('parent_id', $ids)
+            $childIds = ProductCategory::whereIn('parent_id', $ids)
                 ->pluck('id')
-                ->map(fn ($id) => (int) $id)
+                ->map(fn($id) => (int) $id)
                 ->all();
 
             $newIds = array_values(array_diff($childIds, $ids));

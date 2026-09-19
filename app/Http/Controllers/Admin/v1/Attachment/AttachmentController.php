@@ -48,6 +48,7 @@ class AttachmentController extends Controller
         )
             ->when($keyword, fn($query) => $query->where('original_name', 'like', "%{$keyword}%"))
             ->when($onlyImage, fn($query) => $query->where('mime_type', 'like', 'image/%'))
+            ->orderBy('id')
             ->get()
             ->each(fn($file) => $file->type = 'file');
 
@@ -55,6 +56,24 @@ class AttachmentController extends Controller
         $items = $folders->concat($attachments)->sortByDesc('type')->values();
 
         return ApiResponse::success($items);
+    }
+
+    /**
+     * 批量修改附件 folder_id 绑定
+     */
+    public function updateFolderId(Request $request)
+    {
+        $attachment_ids = $this->parseIds($request->input('attachment_ids', ''));
+        $folder_id = $request->input('folder_id', 0);
+
+        if (empty($attachment_ids)) {
+            return ApiResponse::error('请选择要操作的附件');
+        }
+
+        Attachment::whereIn('id', $attachment_ids)
+            ->update(['folder_id' => $folder_id]);
+
+        return ApiResponse::success([], '操作成功');
     }
 
     /**

@@ -4,9 +4,9 @@ namespace App\Models\Product;
 
 use App\Models\BaseModel;
 
-class Brand extends BaseModel
+class ProductBrand extends BaseModel
 {
-    protected $table = 'brand';
+    protected $table = 'product_brand';
 
     /**
      * The attributes that are mass assignable.

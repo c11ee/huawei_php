@@ -59,6 +59,7 @@ class ImportCategoriesCommand extends Command
                     'category_name' => $item['category_name'],
                     'parent_id' => $sourceParentId === 0 ? 0 : $idMap[$sourceParentId],
                     'sort' => $item['sort'],
+                    'status' => 1,
                     'created_at' => $now,
                     'updated_at' => $now,
                 ]);

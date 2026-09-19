@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Admin\v1\Product;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
-use App\Models\Product\Brand;
+use App\Models\Product\ProductBrand;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller
@@ -14,7 +14,7 @@ class BrandController extends Controller
      */
     public function index(Request $request)
     {
-        $brands = Brand::query()->paginate($request->input('limit', 10));
+        $brands = ProductBrand::query()->paginate($request->input('limit', 10));
         return ApiResponse::success([
             'data' => $brands->items(),
             'page' => $brands->currentPage(),
@@ -28,7 +28,7 @@ class BrandController extends Controller
     public function store(Request $request)
     {
         $data = $this->validateData($request);
-        Brand::create($data);
+        ProductBrand::create($data);
         return ApiResponse::success([], '添加成功');
     }
 
@@ -38,7 +38,7 @@ class BrandController extends Controller
     public function update(Request $request, string $id)
     {
         $data = $this->validateData($request);
-        $brand = Brand::query()->find($id);
+        $brand = ProductBrand::query()->find($id);
         $brand->update($data);
         return ApiResponse::success([], '更新成功');
     }
@@ -57,7 +57,7 @@ class BrandController extends Controller
             return ApiResponse::error('参数错误');
         }
 
-        Brand::whereIn('id', array_values(array_unique($ids)))->delete();
+        ProductBrand::whereIn('id', array_values(array_unique($ids)))->delete();
 
         return ApiResponse::success([], '删除成功');
     }
@@ -86,7 +86,7 @@ class BrandController extends Controller
 
 
 
-        $updated = Brand::whereIn('id', $ids)->update([
+        $updated = ProductBrand::whereIn('id', $ids)->update([
             'status' => (int) $request->status,
         ]);
 
