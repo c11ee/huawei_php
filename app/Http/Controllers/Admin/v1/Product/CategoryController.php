@@ -63,6 +63,20 @@ class CategoryController extends Controller
 
         $category->update($data);
 
+        // 状态变更时, 级联同步到所有子孙分类
+        if ($category->wasChanged('status')) {
+            $childIds = array_values(array_diff(
+                $this->descendantIds((int) $category->id),
+                [(int) $category->id]
+            ));
+
+            if ($childIds !== []) {
+                ProductCategory::whereIn('id', $childIds)->update([
+                    'status' => $category->status,
+                ]);
+            }
+        }
+
         return ApiResponse::success([], '更新成功');
     }
 

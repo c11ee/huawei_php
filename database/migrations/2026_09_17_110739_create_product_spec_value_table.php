@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('image_url', 255)->comment('规格值主图');
             $table->integer('sort')->default(0)->comment('排序');
             $table->timestamps();
+
+            $table->unique(['spec_id', 'value'], 'uk_spec_value');
         });
     }
 

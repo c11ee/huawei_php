@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('spu_id')->comment('SPU ID');
             $table->string('sku_code', 64)->comment('SKU编码');
             $table->string('name', 64)->comment('SKU名称');
+            $table->tinyInteger('is_default')->default(0)->comment('是否默认');
             $table->char('spec_hash', 64)->comment('规格组合 SHA-256 防重复');
             $table->json('spec_json')->nullable()->comment('规格快照');
             $table->string('image_url', 255)->comment('SKU主图');
@@ -28,11 +29,11 @@ return new class extends Migration
             $table->decimal('volume', 12, 4)->default(0.00)->comment('体积, m³');
             $table->tinyInteger('status')->default(0)->comment('状态 0禁用 1启用');
             $table->integer('sort')->default(0)->comment('排序');
-            $table->integer('created_by')->comment('创建人');
-            $table->integer('updated_by')->comment('更新人');
-            // 软删除
-            $table->softDeletes();
+            $table->bigInteger('created_by')->comment('创建人');
+            $table->bigInteger('updated_by')->comment('更新人');
             $table->timestamps();
+
+            $table->unique(['spu_id', 'spec_hash'], 'uk_spu_spec_hash');
         });
     }
 

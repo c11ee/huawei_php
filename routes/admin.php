@@ -104,10 +104,11 @@ Route::prefix('admin')->group(function () {
             Route::prefix('product')->group(function () {
                 Route::get('/', [ProductController::class, 'index'])->name('product.index')->middleware('can:product.index');
                 Route::post('/', [ProductController::class, 'store'])->name('product.store')->middleware('can:product.store');
+                Route::put('/status', [ProductController::class, 'updateStatus'])->name('product.updateStatus')->middleware('can:product.updateStatus');
+                Route::put('/restore', [ProductController::class, 'restore'])->name('product.restore')->middleware('can:product.restore');
                 Route::put('/{id}', [ProductController::class, 'update'])->name('product.update')->middleware('can:product.update');
                 Route::delete('/{id}', [ProductController::class, 'destroy'])->name('product.destroy')->middleware('can:product.destroy');
                 Route::get('/{id}', [ProductController::class, 'show'])->name('product.show')->middleware('can:product.show');
-                Route::put('/status', [ProductController::class, 'updateStatus'])->name('product.updateStatus')->middleware('can:product.updateStatus');
             });
         });
 

@@ -12,12 +12,17 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('product_sku_spec_value', function (Blueprint $table) {
-            $table->id();
-            $table->bigInteger('spu_id')->comment('SPU ID');
-            $table->bigInteger('sku_id')->comment('SKU ID');
-            $table->bigInteger('spec_id')->comment('规格 ID');
-            $table->bigInteger('spec_value_id')->comment('规格值 ID');
-            $table->timestamps();
+            $table->foreignId('spu_id')->constrained('product_spu')->cascadeOnDelete();
+            $table->foreignId('sku_id')->constrained('product_sku')->cascadeOnDelete();
+            $table->foreignId('spec_id')->constrained('product_spec')->cascadeOnDelete();
+            $table->foreignId('spec_value_id')->constrained('product_spec_value')->cascadeOnDelete();
+
+            // 联合主键: 防止同一个 SKU 重复绑定同一个规格值
+            $table->primary(['sku_id', 'spec_value_id']);
+
+            // 索引优化: 方便反查
+            $table->index('spec_value_id'); // 核心: 根据规格值反查 SKU
+            $table->index(['spu_id', 'spec_id']);
         });
     }
 

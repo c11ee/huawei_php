@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use App\Models\System\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BaseModel extends Model
 {
@@ -46,5 +48,21 @@ class BaseModel extends Model
     public function getUpdatedAtTsAttribute()
     {
         return $this->updated_at?->timestamp;
+    }
+
+    /**
+     * 创建人
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * 更新人
+     */
+    public function updater(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

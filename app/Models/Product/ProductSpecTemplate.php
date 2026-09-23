@@ -10,19 +10,7 @@ class ProductSpecTemplate extends BaseModel
 {
     protected $table = 'product_spec_template';
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
-    protected $fillable = [
-        'name',
-        'sort',
-        'status',
-        'spec_json',
-        'created_by',
-        'updated_by',
-    ];
+    protected $guarded = [];
 
     /**
      * 属性转换

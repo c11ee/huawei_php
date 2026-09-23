@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin\v1\Traits;
+namespace App\Traits;
 
-use App\Models\Attachment;
-use App\Models\Folder;
+use App\Models\Attachment\Attachment;
+use App\Models\Attachment\Folder;
 use Illuminate\Support\Facades\Storage;
 
 trait RecycleFolderTrait

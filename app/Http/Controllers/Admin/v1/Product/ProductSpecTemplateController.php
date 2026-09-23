@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\Product\ProductSpecTemplate;
+use App\Traits\BatchUpdateStatusTrait;
 use Illuminate\Http\Request;
 
 class ProductSpecTemplateController extends Controller
 {
+    use BatchUpdateStatusTrait;
+
     /**
      * Display a listing of the resource.
      */
@@ -62,10 +65,10 @@ class ProductSpecTemplateController extends Controller
     /**
      * 删除规格模板（支持逗号分隔批量删除，连同子孙规格模板一并删除）
      */
-    public function destroy(string $id)
+    public function destroy(string $ids)
     {
         $ids = array_values(array_filter(
-            array_map('intval', explode(',', $id)),
+            array_map('intval', explode(',', $ids)),
             fn($v) => $v > 0
         ));
 
@@ -83,34 +86,7 @@ class ProductSpecTemplateController extends Controller
      */
     public function updateStatus(Request $request)
     {
-        $request->validate([
-            'ids' => 'required|string',
-            'status' => 'required|integer',
-        ], [
-            'ids.required' => '规格模板ID不能为空',
-            'status.required' => '状态不能为空',
-            'status.integer' => '状态必须为整数',
-        ]);
-
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $request->ids)),
-            fn($v) => $v > 0
-        ));
-        if ($ids === []) {
-            return ApiResponse::error('参数错误');
-        }
-
-
-
-        $updated = ProductSpecTemplate::whereIn('id', $ids)->update([
-            'status' => (int) $request->status,
-        ]);
-
-        if ($updated === 0) {
-            return ApiResponse::error('更新失败');
-        }
-
-        return ApiResponse::success([], '更新成功');
+        return $this->batchUpdateStatus($request, ProductSpecTemplate::class);
     }
 
     /**

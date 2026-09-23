@@ -2,11 +2,20 @@
 
 namespace App\Http\Resources;
 
+use App\Models\System\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource
 {
+    /**
+     * 关联用户为空时返回 null, 否则包装为资源
+     */
+    public static function nullable(?User $user): ?self
+    {
+        return $user ? new self($user) : null;
+    }
+
     /**
      * Transform the resource into an array.
      *

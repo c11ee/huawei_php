@@ -17,8 +17,8 @@ return new class extends Migration
             $table->json('spec_json')->nullable()->comment('规格JSON');
             $table->tinyInteger('status')->default(1)->comment('状态');
             $table->integer('sort')->default(0)->comment('排序');
-            $table->integer('created_by')->comment('创建人');
-            $table->integer('updated_by')->comment('更新人');
+            $table->bigInteger('created_by')->comment('创建人');
+            $table->bigInteger('updated_by')->comment('更新人');
             $table->timestamps();
         });
     }

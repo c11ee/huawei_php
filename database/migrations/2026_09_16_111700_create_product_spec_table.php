@@ -19,6 +19,8 @@ return new class extends Migration
             // $table->tinyInteger('status')->default(0)->comment('状态 0禁用 1启用');
             $table->integer('sort')->default(0)->comment('排序');
             $table->timestamps();
+
+            $table->unique(['spu_id', 'name'], 'uk_spu_name');
         });
     }
 

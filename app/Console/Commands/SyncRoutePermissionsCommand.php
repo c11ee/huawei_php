@@ -25,6 +25,7 @@ class SyncRoutePermissionsCommand extends Command
         'update'        => '更新',
         'destroy'       => '删除',
         'updateStatus'  => '更新状态',
+        'restore'       => '恢复',
     ];
 
     // 入口
