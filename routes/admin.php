@@ -50,7 +50,7 @@ Route::prefix('admin')->group(function () {
             // 用户管理
             Route::prefix('user')->group(function () {
                 Route::get('/info', [AuthController::class, 'getUserInfo']);
-                Route::get('/permissions', [AuthController::class, 'getPermissions'])->name('user.permissions')->middleware('can:user.permissions');
+                Route::get('/permissions', [AuthController::class, 'getPermissions']);
                 Route::get('/', [UserController::class, 'index'])->name('user.index')->middleware('can:user.index');
                 Route::post('/', [UserController::class, 'store'])->name('user.store')->middleware('can:user.store');
                 Route::put('/{id}', [UserController::class, 'update'])->name('user.update')->middleware('can:user.update');

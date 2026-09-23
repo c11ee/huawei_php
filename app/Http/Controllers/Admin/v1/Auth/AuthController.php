@@ -33,11 +33,11 @@ class AuthController extends Controller
         $user = User::where('username', $request->username)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return ApiResponse::error('用户名或密码错误', 401);
+            return ApiResponse::error('用户名或密码错误');
         }
 
         if ($user->status != 1) {
-            return ApiResponse::error('用户已禁用', 401);
+            return ApiResponse::error('用户已禁用');
         }
 
         // 有效期较短的 token
