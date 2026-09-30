@@ -4,6 +4,7 @@ namespace App\Traits;
 
 use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 
 trait BatchUpdateStatusTrait
 {
@@ -30,9 +31,16 @@ trait BatchUpdateStatusTrait
             return ApiResponse::error('参数错误');
         }
 
-        $updated = $model::whereIn('id', $ids)->update([
+        $data = [
             'status' => (int) $request->status,
-        ]);
+        ];
+
+        // 仅当表存在 updated_by 字段时才写入
+        if (Schema::hasColumn((new $model)->getTable(), 'updated_by')) {
+            $data['updated_by'] = $request->user()->id;
+        }
+
+        $updated = $model::whereIn('id', $ids)->update($data);
 
         if ($updated === 0) {
             return ApiResponse::error('更新失败');
