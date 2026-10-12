@@ -15,7 +15,7 @@ class CategoryController extends Controller
     public function index()
     {
         $tree = ProductCategory::where('parent_id', 0)
-            ->with('children')
+            ->with('children', 'goods')
             ->orderBy('sort')
             ->get();
 

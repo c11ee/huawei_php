@@ -35,19 +35,42 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $limit   = $request->input('limit', 10);
+        $categoryIds = $request->input('category_ids', []);
+
         $keyword = trim($request->input('keyword', ''));
         // 是否查看回收站商品
         $showTrashed = $request->input('show_trashed', 0);
         // 状态
         $status = $request->input('status', null);
+        $order_by = $request->input('order_by', null);
 
         $query = ProductSpu::query()
             ->when($showTrashed, fn($query) => $query->onlyTrashed())
             ->when($status, fn($query) => $query->where('status', $status))
             ->with('brand', 'creator', 'updater', 'categories')
             ->orderBy('sort');
+
+        if ($categoryIds) {
+            $query->whereHas('categories', fn($q) => $q->whereIn('product_spu_category.category_id', $categoryIds));
+        }
+
+        if ($order_by) {
+            // 格式：字段:方向，如 created_at:desc
+            [$field, $direction] = array_pad(explode(':', $order_by, 2), 2, '');
+            // 转小写
+            $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
+
+            if (in_array($field, ['id', 'sort', 'status', 'created_at', 'updated_at'], true)) {
+                // 移出现有排序,重新排序
+                $query->reorder($field, $direction);
+            }
+        }
+
         if ($keyword) {
-            $query->where('product_name', 'like', '%' . $keyword . '%')->orWhere('spu_code', 'like', '%' . $keyword . '$');
+            $query->where(function ($q) use ($keyword) {
+                $q->where('product_name', 'like', '%' . $keyword . '%')
+                    ->orWhere('spu_code', 'like', '%' . $keyword . '%');
+            });
         }
         $products = $query->paginate($limit);
 

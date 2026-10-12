@@ -35,6 +35,7 @@ class ProductRequest extends FormRequest
             //     Rule::unique('product_spu', 'spu_code')->ignore($this->input('spu.id'))
             // ],
             'spu.product_name'        => ['required', 'string', 'max:255'],
+            'spu.product_short_name'  => ['nullable', 'string', 'max:255'],
             'spu.product_description' => ['nullable', 'string', 'max:1000'],
             'spu.brand_id'            => ['nullable', 'integer', 'min:0'],
             'spu.spec_template_id'    => ['nullable', 'integer', 'min:0'],

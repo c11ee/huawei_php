@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('spu_code', 64)->comment('SPU编码');
             $table->string('product_name', 128)->comment('产品名称');
+            $table->string('product_short_name', 128)->comment('产品简短名称');
             $table->string('product_description', 255)->nullable()->comment('产品描述');
             $table->bigInteger('brand_id')->comment('品牌ID');
             $table->json('slider_images')->nullable()->comment('轮播图');
@@ -28,6 +29,7 @@ return new class extends Migration
             $table->decimal('min_sale_price', 12, 2)->comment('最小销售价格');
             $table->decimal('max_sale_price', 12, 2)->comment('最大销售价格');
             $table->integer('total_stock')->comment('总库存');
+            $table->bigInteger('total_sales')->default(0)->comment('总销量');
             $table->tinyInteger('status')->default(0)->comment('状态 0: 草稿 1: 上架 2: 下架');
             $table->integer('sort')->default(0)->comment('排序');
             $table->bigInteger('created_by')->comment('创建人');

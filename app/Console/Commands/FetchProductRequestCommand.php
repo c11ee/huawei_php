@@ -18,7 +18,12 @@ class FetchProductRequestCommand extends Command
     /**
      * 商品分类
      */
-    private const CATEGORY_IDS = [12];
+    private const CATEGORY_IDS = [53];
+
+    /**
+     * 商品页 URL 前缀
+     */
+    private const TARGET_URL_PREFIX = 'https://m.vmall.com/product/comdetail/index.html?';
 
     /**
      * 待抓取的商品页 URL 列表
@@ -26,15 +31,17 @@ class FetchProductRequestCommand extends Command
      * @var array<int, string>
      */
     private const TARGET_URLS = [
-        'https://m.vmall.com/product/comdetail/index.html?prdId=10086309795952&sbomCode=3104030003803',
-        'https://m.vmall.com/product/comdetail/index.html?prdId=10086569257010&sbomCode=3102010032801'
+        'prdId=10086428410583&sbomCode=4602010018401',
+        'prdId=10086178147970&sbomCode=4602010012803',
+        'prdId=10086690832694&sbomCode=34020000517',
     ];
 
     public function handle(ProductService $productService): int
     {
         $failed = 0;
 
-        foreach (self::TARGET_URLS as $url) {
+        foreach (self::TARGET_URLS as $relativeUrl) {
+            $url = self::TARGET_URL_PREFIX . $relativeUrl;
             try {
                 $requestData = $this->fetchRequestData($url);
                 $spu = $productService->saveProduct($requestData);
@@ -65,7 +72,7 @@ class FetchProductRequestCommand extends Command
      *
      * @return array<string, mixed>
      */
-    private function fetchRequestData(string $url): array
+    public function fetchRequestData(string $url): array
     {
         $htmlContent = $this->fetchHtml($url);
 
@@ -270,8 +277,9 @@ class FetchProductRequestCommand extends Command
 
         return [
             'brand_id'            => 1,
-            'product_description' => $current['briefName'] ?? '',
             'product_name'        => $current['name'] ?? '',
+            'product_short_name'  => $current['briefName'] ?? '',
+            'product_description' => $sbom['sbomPromWord'] ?? '',
             'slider_images'       => $sliderImages,
             'sort'                => 1,
             'spec_template_id'    => 0,

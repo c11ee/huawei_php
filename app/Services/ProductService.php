@@ -29,6 +29,7 @@ class ProductService
             // ==========================================
             $spuPayload = [
                 'product_name'        => $data['spu']['product_name'],
+                'product_short_name'  => $data['spu']['product_short_name'],
                 'product_description' => $data['spu']['product_description'] ?? '',
                 'brand_id'            => $data['spu']['brand_id'] ?? 0,
                 'spec_template_id'    => $data['spu']['spec_template_id'] ?? 0,

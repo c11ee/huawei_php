@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('strike_price', 12, 2)->default(0.00)->comment('划线价格');
             $table->integer('stock')->default(0)->comment('库存');
             $table->integer('locked_stock')->default(0)->comment('锁定库存');
+            $table->bigInteger('sales')->default(0)->comment('销量');
             $table->decimal('weight', 10, 3)->default(0.00)->comment('重量, kg');
             $table->decimal('volume', 12, 4)->default(0.00)->comment('体积, m³');
             $table->tinyInteger('status')->default(0)->comment('状态 0禁用 1启用');
