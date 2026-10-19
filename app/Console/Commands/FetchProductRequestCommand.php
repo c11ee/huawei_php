@@ -18,7 +18,7 @@ class FetchProductRequestCommand extends Command
     /**
      * 商品分类
      */
-    private const CATEGORY_IDS = [53];
+    private const CATEGORY_IDS = [18];
 
     /**
      * 商品页 URL 前缀
@@ -31,9 +31,9 @@ class FetchProductRequestCommand extends Command
      * @var array<int, string>
      */
     private const TARGET_URLS = [
-        'prdId=10086428410583&sbomCode=4602010018401',
-        'prdId=10086178147970&sbomCode=4602010012803',
-        'prdId=10086690832694&sbomCode=34020000517',
+        'prdId=10086270081540&sbomCode=2601010611528',
+        'prdId=10086756705081&sbomCode=2601010611610',
+        'prdId=10086174757473&sbomCode=2601010613211',
     ];
 
     public function handle(ProductService $productService): int
@@ -180,8 +180,11 @@ class FetchProductRequestCommand extends Command
     {
         $nameOrder = [];
         $values = [];
+        $valueImages = [];
 
         foreach ($current['base'] ?? [] as $sku) {
+            $imageUrl = $this->photoUrl($sku['photoPath'] ?? '', $sku['photoName'] ?? '');
+
             foreach ($sku['gbomAttrList'] ?? [] as $attr) {
                 $name = $attr['attrName'] ?? '';
                 $value = $attr['attrValue'] ?? '';
@@ -191,22 +194,29 @@ class FetchProductRequestCommand extends Command
 
                 $nameOrder[$name] = true;
                 $values[$name][$value] = true;
+
+                // 同一规格值可能被多个 SKU 引用，取第一个非空图片
+                if ($imageUrl !== '' && empty($valueImages[$name][$value])) {
+                    $valueImages[$name][$value] = $imageUrl;
+                }
             }
         }
 
         $specs = [];
         foreach (array_keys($nameOrder) as $nameIndex => $name) {
+            $isColor = $name === '颜色';
+
             $valueRows = [];
             foreach (array_keys($values[$name]) as $valueIndex => $value) {
                 $valueRows[] = [
-                    'image_url' => '',
+                    'image_url' => $isColor ? ($valueImages[$name][$value] ?? '') : '',
                     'sort'      => $valueIndex + 1,
                     'value'     => $value,
                 ];
             }
 
             $specs[] = [
-                'is_image_required' => 0,
+                'is_image_required' => $isColor ? 1 : 0,
                 'name'              => $name,
                 'sort'              => $nameIndex + 1,
                 'values'            => $valueRows,

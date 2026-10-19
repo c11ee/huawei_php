@@ -56,6 +56,9 @@
         },
         {
             "name": "商品"
+        },
+        {
+            "name": "测试"
         }
     ],
     "paths": {
@@ -5153,6 +5156,29 @@
                     }
                 },
                 "x-apifox-folder": "前台/商品"
+            }
+        },
+        "/api/v1/test": {
+            "get": {
+                "tags": [
+                    "测试"
+                ],
+                "summary": "测试接口",
+                "operationId": "get.api.v1.test",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/测试"
             }
         }
     },
