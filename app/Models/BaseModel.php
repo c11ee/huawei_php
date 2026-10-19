@@ -51,6 +51,21 @@ class BaseModel extends Model
     }
 
     /**
+     * 仅当对应的时间字段被实际查询出来时，才追加时间戳
+     * 避免 select 精简字段时输出值为 null 的 created_at_ts / updated_at_ts
+     */
+    protected function getArrayableAppends()
+    {
+        return array_filter(parent::getArrayableAppends(), function ($key) {
+            return match ($key) {
+                'created_at_ts' => array_key_exists('created_at', $this->attributes),
+                'updated_at_ts' => array_key_exists('updated_at', $this->attributes),
+                default         => true,
+            };
+        });
+    }
+
+    /**
      * 创建人
      */
     public function creator(): BelongsTo

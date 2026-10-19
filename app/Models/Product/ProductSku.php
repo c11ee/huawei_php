@@ -25,6 +25,19 @@ class ProductSku extends BaseModel
     }
 
     /**
+     * 正查: 当前 SKU 拥有的所有规格项
+     */
+    public function specs(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            ProductSpec::class,
+            'product_sku_spec_value',
+            'sku_id',
+            'spec_id',
+        )->select('product_spec.id', 'product_spec.name');
+    }
+
+    /**
      * 正查: 当前 SKU 拥有的所有规格值
      */
     public function specValues(): BelongsToMany
@@ -35,5 +48,28 @@ class ProductSku extends BaseModel
             'sku_id',
             'spec_value_id',
         )->withPivot(['spu_id', 'spec_id']);
+    }
+
+    /**
+     * 规格映射: {规格ID: 规格值ID}
+     */
+    public function getSpecValueMapAttribute(): array
+    {
+        // 已预加载时直接用，避免触发懒加载把 spec_values 带进输出；否则单独查询
+        $specValues = $this->relationLoaded('specValues')
+            ? $this->specValues
+            : $this->specValues()->get();
+
+        return $specValues->mapWithKeys(
+            fn($item) => [$item->pivot->spec_id => $item->id]
+        )->all();
+    }
+
+    /**
+     * 追加规格映射字段
+     */
+    protected function getArrayableAppends()
+    {
+        return array_merge(parent::getArrayableAppends(), ['spec_value_map']);
     }
 }

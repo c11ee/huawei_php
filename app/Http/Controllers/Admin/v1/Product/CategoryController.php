@@ -114,6 +114,7 @@ class CategoryController extends Controller
             'parent_id' => 'nullable|integer|min:0',
             'sort' => 'nullable|integer',
             'status' => 'nullable|integer',
+            'is_home' => 'nullable|integer',
             'icon' => 'nullable|string|max:255',
         ], [
             'category_name.required' => '分类名称不能为空',
@@ -122,6 +123,7 @@ class CategoryController extends Controller
             'parent_id.min' => '父分类ID不能小于0',
             'sort.integer' => '排序值必须为整数',
             'status.integer' => '状态必须为整数',
+            'is_home.integer' => 'is_home 必须为整数',
             'icon.string' => '图标必须为字符串',
             'icon.max' => '图标不能超过255个字符',
         ]);
@@ -131,6 +133,7 @@ class CategoryController extends Controller
             'parent_id' => (int) ($data['parent_id'] ?? 0),
             'sort' => (int) ($data['sort'] ?? 0),
             'status' => (int) ($data['status'] ?? 0),
+            'is_home' => (int) ($data['is_home'] ?? 0),
             'icon' => $data['icon'] ?? '',
         ];
     }

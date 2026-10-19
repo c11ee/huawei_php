@@ -1,6 +1,6 @@
 <?php
 
-namespace app\Services;
+namespace App\Services;
 
 use App\Models\Product\ProductDetail;
 use App\Models\Product\ProductSku;
@@ -8,11 +8,18 @@ use App\Models\Product\ProductSpec;
 use App\Models\Product\ProductSpecValue;
 use App\Models\Product\ProductSpu;
 use Exception;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
 {
+    /**
+     * 获取商品详情（含关联）
+     */
+    public function getProductDetail(string $id): ?ProductSpu
+    {
+        return ProductSpu::with('brand', 'creator', 'detail', 'updater', 'categories', 'specs', 'skus')->find($id);
+    }
+
     /**
      * 保存商品 (新增/编辑)
      */
@@ -29,7 +36,7 @@ class ProductService
             // ==========================================
             $spuPayload = [
                 'product_name'        => $data['spu']['product_name'],
-                'product_short_name'  => $data['spu']['product_short_name'],
+                'product_short_name'  => $data['spu']['product_short_name'] ?? '',
                 'product_description' => $data['spu']['product_description'] ?? '',
                 'brand_id'            => $data['spu']['brand_id'] ?? 0,
                 'spec_template_id'    => $data['spu']['spec_template_id'] ?? 0,

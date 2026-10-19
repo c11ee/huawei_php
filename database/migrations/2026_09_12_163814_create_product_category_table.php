@@ -17,6 +17,7 @@ return new class extends Migration
             $table->bigInteger('parent_id')->default(0)->comment('父分类ID');
             $table->string('icon')->default('')->comment('图标');
             $table->integer('status')->default(0)->comment('状态');
+            $table->integer('is_home')->default(0)->comment('是否首页分类');
             $table->integer('sort')->default(0)->comment('排序字段');
 
             $table->index(['parent_id', 'sort'], 'idx_parent_order');

@@ -91,5 +91,6 @@ return [
         'user.permissions'  => '用户权限',
         'attachment.updateFolderId'  => '批量修改文件夹绑定',
         'product.index'  => '商品列表',
+        'product.updateCategory'  => '批量修改分类',
     ],
 ];

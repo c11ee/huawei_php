@@ -180,8 +180,7 @@ class ProductController extends Controller
      */
     public function show(string $id)
     {
-        $product = ProductSpu::with('brand', 'creator', 'detail', 'updater', 'categories', 'specs', 'skus')->find($id);
-        return ApiResponse::success($product);
+        return ApiResponse::success($this->productService->getProductDetail($id));
     }
 
     /**
@@ -190,5 +189,29 @@ class ProductController extends Controller
     public function updateStatus(Request $request)
     {
         return $this->batchUpdateStatus($request, ProductSpu::class);
+    }
+
+    /**
+     * 批量编辑分类
+     */
+    public function updateCategory(Request $request)
+    {
+        $ids = $request->input('ids');
+        $categoryIds = $request->input('category_ids', []);
+        // 判断覆盖还是追加
+        $isOverride = $request->input('is_override', 0);
+
+        $products = ProductSpu::whereIn('id', $ids)->get();
+        foreach ($products as $product) {
+            if ($isOverride) {
+                // 覆盖
+                $product->categories()->sync($categoryIds);
+            } else {
+                // 追加 & 去重
+                $product->categories()->syncWithoutDetaching($categoryIds);
+            }
+        }
+
+        return ApiResponse::success([], '编辑成功');
     }
 }
