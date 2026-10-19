@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "updatedAt": "2026-10-19T06:47:19.954Z",
+  "projects": {
+    "8943083": {
+      "branches": {},
+      "lastGuardError": {
+        "type": "guard_error",
+        "projectId": 8943083,
+        "message": "Automation caller branch required",
+        "createdAt": "2026-10-19T06:47:19.954Z"
+      },
+      "recentEvents": [
+        {
+          "type": "guard_error",
+          "projectId": 8943083,
+          "message": "Automation caller branch required",
+          "createdAt": "2026-10-19T06:47:14.446Z"
+        },
+        {
+          "type": "guard_error",
+          "projectId": 8943083,
+          "message": "Automation caller branch required",
+          "createdAt": "2026-10-19T06:47:19.954Z"
+        }
+      ]
+    }
+  },
+  "recentEvents": [
+    {
+      "type": "guard_error",
+      "projectId": 8943083,
+      "message": "Automation caller branch required",
+      "createdAt": "2026-10-19T06:47:14.446Z"
+    },
+    {
+      "type": "guard_error",
+      "projectId": 8943083,
+      "message": "Automation caller branch required",
+      "createdAt": "2026-10-19T06:47:19.954Z"
+    }
+  ]
+}
