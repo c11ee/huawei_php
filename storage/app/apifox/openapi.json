@@ -1,0 +1,4694 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Laravel API",
+        "version": "1.0.0",
+        "description": "由 php artisan apifox:sync 自动生成"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "当前环境"
+        }
+    ],
+    "tags": [
+        {
+            "name": "认证管理"
+        },
+        {
+            "name": "权限管理"
+        },
+        {
+            "name": "角色管理"
+        },
+        {
+            "name": "用户管理"
+        },
+        {
+            "name": "用户配置"
+        },
+        {
+            "name": "文件夹管理"
+        },
+        {
+            "name": "附件管理"
+        },
+        {
+            "name": "分类管理"
+        },
+        {
+            "name": "品牌管理"
+        },
+        {
+            "name": "商品规格"
+        },
+        {
+            "name": "商品管理"
+        },
+        {
+            "name": "前台-首页"
+        },
+        {
+            "name": "前台-搜索"
+        },
+        {
+            "name": "前台-分类"
+        },
+        {
+            "name": "前台-商品"
+        }
+    ],
+    "paths": {
+        "/admin/v1/login": {
+            "post": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "登录",
+                "operationId": "post.admin.v1.login",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "username": {
+                                        "type": "string",
+                                        "description": "请输入用户名",
+                                        "example": "admin"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "description": "请输入密码",
+                                        "example": "123456"
+                                    },
+                                    "env": {
+                                        "type": "string",
+                                        "description": "请输入环境",
+                                        "example": "示例"
+                                    }
+                                },
+                                "required": [
+                                    "username",
+                                    "password",
+                                    "env"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/v1/refresh-token": {
+            "post": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "刷新 Token",
+                "operationId": "post.admin.v1.refresh.token",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/logout": {
+            "post": {
+                "tags": [
+                    "认证管理"
+                ],
+                "summary": "退出登录",
+                "operationId": "post.admin.v1.logout",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/permissions": {
+            "get": {
+                "tags": [
+                    "权限管理"
+                ],
+                "summary": "权限列表",
+                "operationId": "permissions.index",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 permissions.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：permissions.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "权限管理"
+                ],
+                "summary": "创建权限",
+                "operationId": "permissions.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 permissions.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：permissions.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "key": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限标识不能为空",
+                                        "example": "user.index"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "path": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限路径必须为字符串",
+                                        "example": "/user"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限图标必须为字符串",
+                                        "example": "ep:menu"
+                                    },
+                                    "type": {
+                                        "enum": [
+                                            1,
+                                            2
+                                        ],
+                                        "type": "integer",
+                                        "description": "权限类型不能为空",
+                                        "example": 1
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "排序不能为空",
+                                        "example": 1
+                                    },
+                                    "remark": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "备注必须为字符串",
+                                        "example": "示例"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "父级ID必须为整数",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "key",
+                                    "name",
+                                    "type",
+                                    "sort"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/permissions/{id}": {
+            "put": {
+                "tags": [
+                    "权限管理"
+                ],
+                "summary": "修改权限",
+                "operationId": "permissions.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 permissions.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：permissions.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "key": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限标识不能为空",
+                                        "example": "user.index"
+                                    },
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "path": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限路径必须为字符串",
+                                        "example": "/user"
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "权限图标必须为字符串",
+                                        "example": "ep:menu"
+                                    },
+                                    "type": {
+                                        "enum": [
+                                            1,
+                                            2
+                                        ],
+                                        "type": "integer",
+                                        "description": "权限类型不能为空",
+                                        "example": 1
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "排序不能为空",
+                                        "example": 1
+                                    },
+                                    "remark": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "备注必须为字符串",
+                                        "example": "示例"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "父级ID必须为整数",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "key",
+                                    "name",
+                                    "type",
+                                    "sort"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "权限管理"
+                ],
+                "summary": "删除权限",
+                "operationId": "permissions.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 permissions.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：permissions.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/role": {
+            "get": {
+                "tags": [
+                    "角色管理"
+                ],
+                "summary": "角色列表",
+                "operationId": "role.index",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "每页条数",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "required": false,
+                        "description": "搜索关键字",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 role.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：role.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "角色管理"
+                ],
+                "summary": "新增角色",
+                "operationId": "role.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 role.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：role.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "角色名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "status": {
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "type": "integer",
+                                        "description": "状态不能为空",
+                                        "example": 0
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "角色描述不能超过255个字符",
+                                        "example": "示例"
+                                    },
+                                    "permission_ids": {
+                                        "type": "array",
+                                        "description": "权限ID必须为数组",
+                                        "example": [],
+                                        "items": {
+                                            "type": "integer",
+                                            "description": "权限ID必须为整数",
+                                            "example": 1
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/role/{id}": {
+            "put": {
+                "tags": [
+                    "角色管理"
+                ],
+                "summary": "修改角色",
+                "operationId": "role.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 role.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：role.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "示例名称"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "example": 0
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    },
+                                    "permission_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "角色管理"
+                ],
+                "summary": "删除角色",
+                "operationId": "role.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 role.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：role.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/role/{id}/status": {
+            "put": {
+                "tags": [
+                    "角色管理"
+                ],
+                "summary": "编辑状态",
+                "operationId": "role.updateStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 role.updateStatus）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：role.updateStatus",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "integer",
+                                        "example": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/user/info": {
+            "get": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "当前用户信息",
+                "operationId": "get.admin.v1.user.info",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/user/permissions": {
+            "get": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "获取用户权限",
+                "operationId": "get.admin.v1.user.permissions",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/user": {
+            "get": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "用户列表",
+                "operationId": "user.index",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "每页条数",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "required": false,
+                        "description": "搜索关键字",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "新增用户",
+                "operationId": "user.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "nickname": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "请输入昵称",
+                                        "example": "示例名称"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "minLength": 4,
+                                        "description": "请输入用户名",
+                                        "example": "admin"
+                                    },
+                                    "phone": {
+                                        "pattern": "^1[3-9]\\d{9}$",
+                                        "type": "string",
+                                        "description": "手机号格式错误",
+                                        "example": "13800138000"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "description": "邮箱已存在",
+                                        "example": "user@example.com"
+                                    },
+                                    "status": {
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "type": "integer",
+                                        "description": "请选择状态",
+                                        "example": 0
+                                    },
+                                    "role_ids": {
+                                        "type": "string",
+                                        "description": "请选择角色",
+                                        "example": "示例"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "maxLength": 128,
+                                        "minLength": 5,
+                                        "description": "请输入密码",
+                                        "example": "123456"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    }
+                                },
+                                "required": [
+                                    "nickname",
+                                    "username",
+                                    "status",
+                                    "role_ids"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/user/{id}": {
+            "put": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "修改用户",
+                "operationId": "user.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "nickname": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "请输入昵称",
+                                        "example": "示例名称"
+                                    },
+                                    "username": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "minLength": 4,
+                                        "description": "请输入用户名",
+                                        "example": "admin"
+                                    },
+                                    "phone": {
+                                        "pattern": "^1[3-9]\\d{9}$",
+                                        "type": "string",
+                                        "description": "手机号格式错误",
+                                        "example": "13800138000"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "description": "邮箱已存在",
+                                        "example": "user@example.com"
+                                    },
+                                    "status": {
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "type": "integer",
+                                        "description": "请选择状态",
+                                        "example": 0
+                                    },
+                                    "role_ids": {
+                                        "type": "string",
+                                        "description": "请选择角色",
+                                        "example": "示例"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "maxLength": 128,
+                                        "minLength": 5,
+                                        "description": "请输入密码",
+                                        "example": "123456"
+                                    },
+                                    "avatar": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    }
+                                },
+                                "required": [
+                                    "nickname",
+                                    "username",
+                                    "status",
+                                    "role_ids"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "删除用户",
+                "operationId": "user.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "get": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "用户详情",
+                "operationId": "user.show",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.show）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.show",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/user/{id}/status": {
+            "put": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "编辑状态",
+                "operationId": "user.updateStatus",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.updateStatus）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.updateStatus",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "status": {
+                                        "type": "integer",
+                                        "example": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/folder/tree": {
+            "get": {
+                "tags": [
+                    "文件夹管理"
+                ],
+                "summary": "获取文件夹树",
+                "operationId": "folder.tree",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 folder.tree）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：folder.tree",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/folder": {
+            "post": {
+                "tags": [
+                    "文件夹管理"
+                ],
+                "summary": "创建文件夹",
+                "operationId": "folder.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 folder.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：folder.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "文件夹名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "description": "父文件夹不存在",
+                                        "example": 1
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须在0到255之间",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/folder/{id}": {
+            "delete": {
+                "tags": [
+                    "文件夹管理"
+                ],
+                "summary": "删除文件夹",
+                "operationId": "folder.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "recycle",
+                        "in": "query",
+                        "required": false,
+                        "description": "是否移入回收站（1 是，0 永久删除）",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 folder.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "接收文件夹id(支持逗号分隔批量删除)\n使用 recycle 字段判断是否删除还是移到回收站\n需要权限：folder.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/attachment": {
+            "get": {
+                "tags": [
+                    "附件管理"
+                ],
+                "summary": "获取文件列表",
+                "operationId": "attachment.index",
+                "parameters": [
+                    {
+                        "name": "folder_id",
+                        "in": "query",
+                        "required": false,
+                        "description": "文件夹 ID",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "required": false,
+                        "description": "搜索关键字",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "only_image",
+                        "in": "query",
+                        "required": false,
+                        "description": "是否仅筛选图片（1 是，0 否）",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "附件管理"
+                ],
+                "summary": "删除文件",
+                "operationId": "attachment.destroy",
+                "parameters": [
+                    {
+                        "name": "attachment_ids",
+                        "in": "query",
+                        "required": false,
+                        "description": "附件 ID 列表，多个用英文逗号分隔",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "folder_ids",
+                        "in": "query",
+                        "required": false,
+                        "description": "文件夹 ID 列表，多个用英文逗号分隔",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "recycle",
+                        "in": "query",
+                        "required": false,
+                        "description": "是否移入回收站（1 是，0 永久删除）",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "接收文件,附件id(支持逗号分隔批量删除), 另一张表 folder_id(文件夹id) 可同时传入\n使用 recycle 字段判断是否删除还是移到回收站",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/attachment/restore": {
+            "put": {
+                "tags": [
+                    "附件管理"
+                ],
+                "summary": "从回收站还原附件/文件夹",
+                "operationId": "attachment.restore",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "接收附件id(支持逗号分隔批量还原), 文件夹id(支持逗号分隔批量还原)\n将附件/文件夹及其内部文件的 recycle 改为 0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "attachment_ids": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    },
+                                    "folder_ids": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/attachment/update-folder-id": {
+            "put": {
+                "tags": [
+                    "附件管理"
+                ],
+                "summary": "批量修改附件 folder_id 绑定",
+                "operationId": "attachment.updateFolderId",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "attachment_ids": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    },
+                                    "folder_id": {
+                                        "type": "integer",
+                                        "example": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/category": {
+            "get": {
+                "tags": [
+                    "分类管理"
+                ],
+                "summary": "分类列表（树形，不分页）",
+                "operationId": "category.index",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 category.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：category.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "分类管理"
+                ],
+                "summary": "新增分类",
+                "operationId": "category.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 category.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：category.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "category_name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "description": "分类名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "父分类ID必须为整数",
+                                        "example": 1
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须为整数",
+                                        "example": 1
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态必须为整数",
+                                        "example": 1
+                                    },
+                                    "is_home": {
+                                        "type": "integer",
+                                        "description": "is_home 必须为整数",
+                                        "example": 1
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "图标必须为字符串",
+                                        "example": "ep:menu"
+                                    }
+                                },
+                                "required": [
+                                    "category_name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/category/{id}": {
+            "put": {
+                "tags": [
+                    "分类管理"
+                ],
+                "summary": "更新分类",
+                "operationId": "category.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 category.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：category.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "category_name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "description": "分类名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "parent_id": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "父分类ID必须为整数",
+                                        "example": 1
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须为整数",
+                                        "example": 1
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态必须为整数",
+                                        "example": 1
+                                    },
+                                    "is_home": {
+                                        "type": "integer",
+                                        "description": "is_home 必须为整数",
+                                        "example": 1
+                                    },
+                                    "icon": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "图标必须为字符串",
+                                        "example": "ep:menu"
+                                    }
+                                },
+                                "required": [
+                                    "category_name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "分类管理"
+                ],
+                "summary": "删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）",
+                "operationId": "category.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 category.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：category.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/brand": {
+            "get": {
+                "tags": [
+                    "品牌管理"
+                ],
+                "summary": "品牌列表",
+                "operationId": "brand.index",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "每页条数",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 brand.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：brand.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "品牌管理"
+                ],
+                "summary": "新增品牌",
+                "operationId": "brand.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 brand.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：brand.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "description": "品牌名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "logo": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "logo必须为字符串",
+                                        "example": "https://example.com/image.jpg"
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须为整数",
+                                        "example": 1
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态必须为整数",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/brand/status": {
+            "put": {
+                "tags": [
+                    "品牌管理"
+                ],
+                "summary": "编辑状态",
+                "operationId": "brand.updateStatus",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 brand.updateStatus）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：brand.updateStatus",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "ID不能为空",
+                                        "example": "示例"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态不能为空",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "ids",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/brand/{id}": {
+            "put": {
+                "tags": [
+                    "品牌管理"
+                ],
+                "summary": "修改品牌",
+                "operationId": "brand.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 brand.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：brand.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "description": "品牌名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "logo": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "logo必须为字符串",
+                                        "example": "https://example.com/image.jpg"
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须为整数",
+                                        "example": 1
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态必须为整数",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "品牌管理"
+                ],
+                "summary": "删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）",
+                "operationId": "brand.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 brand.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：brand.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/spec-template": {
+            "get": {
+                "tags": [
+                    "商品规格"
+                ],
+                "summary": "商品规格列表",
+                "operationId": "spec-template.index",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "required": false,
+                        "description": "搜索关键字",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "每页条数",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 spec-template.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：spec-template.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "商品规格"
+                ],
+                "summary": "新增商品规格",
+                "operationId": "spec-template.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 spec-template.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：spec-template.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "description": "规格模板名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "spec_json": {
+                                        "type": "array",
+                                        "description": "规格JSON必须为数组",
+                                        "example": [],
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须为整数",
+                                        "example": 1
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态必须为整数",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/spec-template/status": {
+            "put": {
+                "tags": [
+                    "商品规格"
+                ],
+                "summary": "编辑状态",
+                "operationId": "spec-template.updateStatus",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 spec-template.updateStatus）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：spec-template.updateStatus",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "ID不能为空",
+                                        "example": "示例"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态不能为空",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "ids",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/spec-template/{id}": {
+            "put": {
+                "tags": [
+                    "商品规格"
+                ],
+                "summary": "修改商品规格",
+                "operationId": "spec-template.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 spec-template.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：spec-template.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 100,
+                                        "description": "规格模板名称不能为空",
+                                        "example": "示例名称"
+                                    },
+                                    "spec_json": {
+                                        "type": "array",
+                                        "description": "规格JSON必须为数组",
+                                        "example": [],
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "sort": {
+                                        "type": "integer",
+                                        "description": "排序值必须为整数",
+                                        "example": 1
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态必须为整数",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "name"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "商品规格"
+                ],
+                "summary": "删除规格模板（支持逗号分隔批量删除，连同子孙规格模板一并删除）",
+                "operationId": "spec-template.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 spec-template.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：spec-template.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/product": {
+            "get": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "商品列表",
+                "operationId": "product.index",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "description": "每页条数",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "category_ids",
+                        "in": "query",
+                        "required": false,
+                        "description": "分类 ID 集合",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "integer"
+                            },
+                            "example": [
+                                1
+                            ]
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "required": false,
+                        "description": "搜索关键字",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "show_trashed",
+                        "in": "query",
+                        "required": false,
+                        "description": "是否查看回收站（1 是，0 否）",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "status",
+                        "in": "query",
+                        "required": false,
+                        "description": "状态",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "name": "order_by",
+                        "in": "query",
+                        "required": false,
+                        "description": "排序字段:方向，如 created_at:desc",
+                        "schema": {
+                            "type": "string",
+                            "example": "示例"
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.index）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.index",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "新增商品",
+                "operationId": "product.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.store）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.store",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "spu": {
+                                        "type": "object",
+                                        "description": "SPU 信息不能为空",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "product_name": {
+                                                "type": "string",
+                                                "maxLength": 255,
+                                                "description": "请输入商品名称",
+                                                "example": "示例名称"
+                                            },
+                                            "product_short_name": {
+                                                "type": "string",
+                                                "maxLength": 255,
+                                                "example": "示例名称"
+                                            },
+                                            "product_description": {
+                                                "type": "string",
+                                                "maxLength": 1000,
+                                                "example": "示例"
+                                            },
+                                            "brand_id": {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "example": 1
+                                            },
+                                            "spec_template_id": {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "example": 1
+                                            },
+                                            "slider_images": {
+                                                "type": "array",
+                                                "minItems": 1,
+                                                "description": "请上传至少一张商品轮播图",
+                                                "example": [],
+                                                "items": {
+                                                    "format": "uri",
+                                                    "type": "string",
+                                                    "description": "请上传至少一张商品轮播图",
+                                                    "example": "https://example.com/image.jpg"
+                                                }
+                                            },
+                                            "video_url": {
+                                                "type": "string",
+                                                "example": "https://example.com/image.jpg"
+                                            },
+                                            "video_cover_url": {
+                                                "type": "string",
+                                                "example": "https://example.com/image.jpg"
+                                            },
+                                            "status": {
+                                                "enum": [
+                                                    0,
+                                                    1,
+                                                    2
+                                                ],
+                                                "type": "integer",
+                                                "example": 0
+                                            },
+                                            "sort": {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "example": 1
+                                            }
+                                        },
+                                        "required": [
+                                            "product_name",
+                                            "slider_images",
+                                            "status"
+                                        ]
+                                    },
+                                    "category_ids": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "description": "请选择商品分类",
+                                        "example": [],
+                                        "items": {
+                                            "type": "integer",
+                                            "description": "选中的某个分类不存在",
+                                            "example": 1
+                                        }
+                                    },
+                                    "detail": {
+                                        "type": "object",
+                                        "properties": {
+                                            "detail_html": {
+                                                "type": "string",
+                                                "example": "示例"
+                                            },
+                                            "mobile_detail_html": {
+                                                "type": "string",
+                                                "example": "示例"
+                                            }
+                                        }
+                                    },
+                                    "specs": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "description": "请配置商品规格",
+                                        "example": [],
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 64,
+                                                    "description": "规格名称不能为空",
+                                                    "example": "示例名称"
+                                                },
+                                                "is_image_required": {
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ],
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "sort": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "example": 1
+                                                },
+                                                "values": {
+                                                    "type": "array",
+                                                    "minItems": 1,
+                                                    "description": "每个规格项下必须至少有一个规格值",
+                                                    "example": [],
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "value": {
+                                                                "type": "string",
+                                                                "maxLength": 64,
+                                                                "description": "规格值文本不能为空",
+                                                                "example": "示例"
+                                                            },
+                                                            "image_url": {
+                                                                "type": "string",
+                                                                "example": "https://example.com/image.jpg"
+                                                            },
+                                                            "sort": {
+                                                                "type": "integer",
+                                                                "minimum": 0,
+                                                                "example": 1
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "value"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "is_image_required",
+                                                "values"
+                                            ]
+                                        }
+                                    },
+                                    "skus": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "description": "至少需要包含一个 SKU",
+                                        "example": [],
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "is_default": {
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ],
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 255,
+                                                    "example": "示例名称"
+                                                },
+                                                "image_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/image.jpg"
+                                                },
+                                                "sale_price": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "description": "SKU 销售价不能为空",
+                                                    "example": 0
+                                                },
+                                                "cost_price": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "strike_price": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "description": "SKU 库存不能为空",
+                                                    "example": 1
+                                                },
+                                                "weight": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "volume": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "status": {
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ],
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "sort": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "example": 1
+                                                },
+                                                "spec_values": {
+                                                    "type": "array",
+                                                    "description": "SKU 规格属性配置不能为空",
+                                                    "example": [],
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "is_default",
+                                                "name",
+                                                "sale_price",
+                                                "stock",
+                                                "status",
+                                                "spec_values"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "spu",
+                                    "category_ids",
+                                    "specs",
+                                    "skus"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/product/status": {
+            "put": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "编辑状态",
+                "operationId": "product.updateStatus",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.updateStatus）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.updateStatus",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "ID不能为空",
+                                        "example": "示例"
+                                    },
+                                    "status": {
+                                        "type": "integer",
+                                        "description": "状态不能为空",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "ids",
+                                    "status"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/product/restore": {
+            "put": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "恢复商品",
+                "operationId": "product.restore",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.restore）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.restore",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "ID不能为空",
+                                        "example": "示例"
+                                    }
+                                },
+                                "required": [
+                                    "ids"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/product/update-category": {
+            "put": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "批量编辑分类",
+                "operationId": "product.updateCategory",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.updateCategory）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.updateCategory",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "example": "示例"
+                                    },
+                                    "category_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        },
+                                        "example": [
+                                            1
+                                        ]
+                                    },
+                                    "is_override": {
+                                        "type": "integer",
+                                        "example": 0
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/product/{id}": {
+            "put": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "修改商品",
+                "operationId": "product.update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.update）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.update",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "spu": {
+                                        "type": "object",
+                                        "description": "SPU 信息不能为空",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer",
+                                                "example": 1
+                                            },
+                                            "product_name": {
+                                                "type": "string",
+                                                "maxLength": 255,
+                                                "description": "请输入商品名称",
+                                                "example": "示例名称"
+                                            },
+                                            "product_short_name": {
+                                                "type": "string",
+                                                "maxLength": 255,
+                                                "example": "示例名称"
+                                            },
+                                            "product_description": {
+                                                "type": "string",
+                                                "maxLength": 1000,
+                                                "example": "示例"
+                                            },
+                                            "brand_id": {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "example": 1
+                                            },
+                                            "spec_template_id": {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "example": 1
+                                            },
+                                            "slider_images": {
+                                                "type": "array",
+                                                "minItems": 1,
+                                                "description": "请上传至少一张商品轮播图",
+                                                "example": [],
+                                                "items": {
+                                                    "format": "uri",
+                                                    "type": "string",
+                                                    "description": "请上传至少一张商品轮播图",
+                                                    "example": "https://example.com/image.jpg"
+                                                }
+                                            },
+                                            "video_url": {
+                                                "type": "string",
+                                                "example": "https://example.com/image.jpg"
+                                            },
+                                            "video_cover_url": {
+                                                "type": "string",
+                                                "example": "https://example.com/image.jpg"
+                                            },
+                                            "status": {
+                                                "enum": [
+                                                    0,
+                                                    1,
+                                                    2
+                                                ],
+                                                "type": "integer",
+                                                "example": 0
+                                            },
+                                            "sort": {
+                                                "type": "integer",
+                                                "minimum": 0,
+                                                "example": 1
+                                            }
+                                        },
+                                        "required": [
+                                            "product_name",
+                                            "slider_images",
+                                            "status"
+                                        ]
+                                    },
+                                    "category_ids": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "description": "请选择商品分类",
+                                        "example": [],
+                                        "items": {
+                                            "type": "integer",
+                                            "description": "选中的某个分类不存在",
+                                            "example": 1
+                                        }
+                                    },
+                                    "detail": {
+                                        "type": "object",
+                                        "properties": {
+                                            "detail_html": {
+                                                "type": "string",
+                                                "example": "示例"
+                                            },
+                                            "mobile_detail_html": {
+                                                "type": "string",
+                                                "example": "示例"
+                                            }
+                                        }
+                                    },
+                                    "specs": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "description": "请配置商品规格",
+                                        "example": [],
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 64,
+                                                    "description": "规格名称不能为空",
+                                                    "example": "示例名称"
+                                                },
+                                                "is_image_required": {
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ],
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "sort": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "example": 1
+                                                },
+                                                "values": {
+                                                    "type": "array",
+                                                    "minItems": 1,
+                                                    "description": "每个规格项下必须至少有一个规格值",
+                                                    "example": [],
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 1
+                                                            },
+                                                            "value": {
+                                                                "type": "string",
+                                                                "maxLength": 64,
+                                                                "description": "规格值文本不能为空",
+                                                                "example": "示例"
+                                                            },
+                                                            "image_url": {
+                                                                "type": "string",
+                                                                "example": "https://example.com/image.jpg"
+                                                            },
+                                                            "sort": {
+                                                                "type": "integer",
+                                                                "minimum": 0,
+                                                                "example": 1
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "value"
+                                                        ]
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "name",
+                                                "is_image_required",
+                                                "values"
+                                            ]
+                                        }
+                                    },
+                                    "skus": {
+                                        "type": "array",
+                                        "minItems": 1,
+                                        "description": "至少需要包含一个 SKU",
+                                        "example": [],
+                                        "items": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "is_default": {
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ],
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "name": {
+                                                    "type": "string",
+                                                    "maxLength": 255,
+                                                    "example": "示例名称"
+                                                },
+                                                "image_url": {
+                                                    "type": "string",
+                                                    "example": "https://example.com/image.jpg"
+                                                },
+                                                "sale_price": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "description": "SKU 销售价不能为空",
+                                                    "example": 0
+                                                },
+                                                "cost_price": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "strike_price": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "stock": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "description": "SKU 库存不能为空",
+                                                    "example": 1
+                                                },
+                                                "weight": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "volume": {
+                                                    "type": "number",
+                                                    "minimum": 0,
+                                                    "example": 0
+                                                },
+                                                "status": {
+                                                    "enum": [
+                                                        0,
+                                                        1
+                                                    ],
+                                                    "type": "integer",
+                                                    "example": 0
+                                                },
+                                                "sort": {
+                                                    "type": "integer",
+                                                    "minimum": 0,
+                                                    "example": 1
+                                                },
+                                                "spec_values": {
+                                                    "type": "array",
+                                                    "description": "SKU 规格属性配置不能为空",
+                                                    "example": [],
+                                                    "items": {
+                                                        "type": "string"
+                                                    }
+                                                }
+                                            },
+                                            "required": [
+                                                "is_default",
+                                                "name",
+                                                "sale_price",
+                                                "stock",
+                                                "status",
+                                                "spec_values"
+                                            ]
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "spu",
+                                    "category_ids",
+                                    "specs",
+                                    "skus"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "删除商品",
+                "operationId": "product.destroy",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "force_delete",
+                        "in": "query",
+                        "required": false,
+                        "description": "是否彻底删除（1 是，0 否）",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.destroy",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "get": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "详情",
+                "operationId": "product.show",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "资源 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.show）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.show",
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/admin/v1/common/user-column-preference/{key}": {
+            "get": {
+                "tags": [
+                    "用户配置"
+                ],
+                "summary": "根据 key 获取用户的列偏好配置",
+                "operationId": "user-column-preference.show",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "required": true,
+                        "description": "配置键",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/v1/common/user-column-preference": {
+            "post": {
+                "tags": [
+                    "用户配置"
+                ],
+                "summary": "保存或更新列偏好配置（保存即更新）",
+                "operationId": "user-column-preference.store",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "key": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "example": "user.index"
+                                    },
+                                    "columns": {
+                                        "type": "array",
+                                        "example": [],
+                                        "items": {
+                                            "type": "string"
+                                        }
+                                    }
+                                },
+                                "required": [
+                                    "key",
+                                    "columns"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/v1/common/upload": {
+            "post": {
+                "tags": [
+                    "附件管理"
+                ],
+                "summary": "上传文件",
+                "operationId": "attachment.upload",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "folder_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "file": {
+                                        "format": "binary",
+                                        "type": "string",
+                                        "example": "示例"
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "folder_id",
+                                    "file",
+                                    "user_id"
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/category": {
+            "get": {
+                "tags": [
+                    "前台-分类"
+                ],
+                "summary": "分类列表（树形，不分页）",
+                "operationId": "get.api.v1.category",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/home": {
+            "get": {
+                "tags": [
+                    "前台-首页"
+                ],
+                "summary": "首页列表",
+                "operationId": "get.api.v1.home",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/search": {
+            "get": {
+                "tags": [
+                    "前台-搜索"
+                ],
+                "summary": "热门搜索",
+                "operationId": "get.api.v1.search",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/product/{spu_id}": {
+            "get": {
+                "tags": [
+                    "前台-商品"
+                ],
+                "summary": "商品详情",
+                "operationId": "get.api.v1.product.spu_id.",
+                "parameters": [
+                    {
+                        "name": "spu_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "商品 SPU ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "Token"
+            }
+        },
+        "schemas": {
+            "ApiResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "integer",
+                        "example": 200,
+                        "description": "业务状态码，200 表示成功"
+                    },
+                    "msg": {
+                        "type": "string",
+                        "example": "ok",
+                        "description": "提示信息"
+                    },
+                    "data": {
+                        "description": "业务数据",
+                        "nullable": true
+                    },
+                    "page": {
+                        "type": "integer",
+                        "description": "当前页码（分页接口返回）"
+                    },
+                    "total": {
+                        "type": "integer",
+                        "description": "总条数（分页接口返回）"
+                    }
+                },
+                "required": [
+                    "code",
+                    "msg",
+                    "data"
+                ]
+            }
+        }
+    }
+}
