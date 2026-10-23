@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\v1\Product\CategoryController;
+use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\Home\HomeController;
 use App\Http\Controllers\Api\v1\Product\ProductController;
 use App\Http\Controllers\Api\v1\Search\SearchController;
@@ -28,6 +29,25 @@ Route::prefix('api')->group(function () {
         // 商品管理
         Route::prefix('product')->group(function () {
             Route::get('/{spu_id}', [ProductController::class, 'show']);
+        });
+
+        // 认证
+        Route::prefix('auth')->group(function () {
+            // 短信验证码接口限制频率，防止被刷
+            Route::post('sendLoginCode', [AuthController::class, 'sendLoginCode'])->middleware('throttle:5,1');
+            Route::post('login', [AuthController::class, 'login']);
+        });
+
+        // 专门用于刷新 Token 的路由（只允许 Refresh Token）
+        Route::middleware([
+            'auth:app',
+            'ability:refresh-token'
+        ])->post('refresh-token', [AuthController::class, 'refreshToken']);
+
+        Route::middleware(['auth:app', 'ability:access-api'])->group(function () {
+            // 写在 auth:app middleware 里，才能获取到用户信息
+            Route::post('logout', [AuthController::class, 'logout']);
+            Route::get('user-info', [AuthController::class, 'getUserInfo']);
         });
     });
 });

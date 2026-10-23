@@ -7,7 +7,7 @@
     },
     "servers": [
         {
-            "url": "http://c39693ad.natappfree.cc",
+            "url": "http://hdec967a.natappfree.cc",
             "description": "开发环境（natapp）"
         }
     ],
@@ -56,6 +56,9 @@
         },
         {
             "name": "商品"
+        },
+        {
+            "name": "认证"
         },
         {
             "name": "测试"
@@ -144,7 +147,7 @@
                     }
                 },
                 "x-apifox-folder": "后台/认证管理",
-                "description": "登录成功后返回 access_token。Apifox 在登录接口「后置操作」中提取 $.data.access_token 到环境变量 access_token（或用公共脚本自动登录），其他接口通过全局参数 Authorization: Bearer {{access_token}} 自动携带。"
+                "description": "登录成功后返回 access_token 和 refresh_token。Apifox 在登录接口「后置操作」中提取 $.data.access_token 到环境变量 access_token、$.data.refresh_token 到环境变量 refresh_token（或用公共脚本自动登录），其他后台接口通过 Authorization: Bearer {{access_token}} 自动携带；调用刷新接口时使用 Authorization: Bearer {{refresh_token}}。"
             }
         },
         "/admin/v1/refresh-token": {
@@ -156,7 +159,7 @@
                 "operationId": "post.admin.v1.refresh.token",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminRefreshAuthorization"
                     }
                 ],
                 "responses": {
@@ -193,7 +196,7 @@
                 "operationId": "post.admin.v1.logout",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -230,7 +233,7 @@
                 "operationId": "permissions.index",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -276,7 +279,7 @@
                 "operationId": "permissions.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -432,7 +435,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -566,7 +569,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -638,7 +641,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -684,7 +687,7 @@
                 "operationId": "role.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -815,7 +818,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -913,7 +916,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -970,7 +973,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1044,7 +1047,7 @@
                 "operationId": "get.admin.v1.user.info",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1081,7 +1084,7 @@
                 "operationId": "get.admin.v1.user.permissions",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1142,7 +1145,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1188,7 +1191,7 @@
                 "operationId": "user.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1342,7 +1345,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1474,7 +1477,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1529,7 +1532,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1586,7 +1589,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1660,7 +1663,7 @@
                 "operationId": "folder.tree",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1708,7 +1711,7 @@
                 "operationId": "folder.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1828,7 +1831,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1912,7 +1915,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -1983,7 +1986,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2021,7 +2024,7 @@
                 "operationId": "attachment.restore",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2089,7 +2092,7 @@
                 "operationId": "attachment.updateFolderId",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2156,7 +2159,7 @@
                 "operationId": "category.index",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2202,7 +2205,7 @@
                 "operationId": "category.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2333,7 +2336,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2446,7 +2449,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2506,7 +2509,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2552,7 +2555,7 @@
                 "operationId": "brand.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2659,7 +2662,7 @@
                 "operationId": "brand.updateStatus",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2752,7 +2755,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2854,7 +2857,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2926,7 +2929,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -2972,7 +2975,7 @@
                 "operationId": "spec-template.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -3190,7 +3193,7 @@
                 "operationId": "spec-template.updateStatus",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -3283,7 +3286,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -3387,7 +3390,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -3512,7 +3515,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -3558,7 +3561,7 @@
                 "operationId": "product.store",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -4126,7 +4129,7 @@
                 "operationId": "product.updateStatus",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -4210,7 +4213,7 @@
                 "operationId": "product.restore",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -4288,7 +4291,7 @@
                 "operationId": "product.updateCategory",
                 "parameters": [
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -4384,7 +4387,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -4743,7 +4746,7 @@
                         "explode": true
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -4798,7 +4801,7 @@
                         }
                     },
                     {
-                        "$ref": "#/components/parameters/Authorization"
+                        "$ref": "#/components/parameters/AdminAuthorization"
                     }
                 ],
                 "responses": {
@@ -5158,6 +5161,250 @@
                 "x-apifox-folder": "前台/商品"
             }
         },
+        "/api/v1/auth/sendLoginCode": {
+            "post": {
+                "tags": [
+                    "认证"
+                ],
+                "summary": "发送登录短信验证码",
+                "operationId": "post.api.v1.auth.sendLoginCode",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "mobile": {
+                                        "type": "string",
+                                        "description": "手机号",
+                                        "example": "13800138000"
+                                    }
+                                },
+                                "required": [
+                                    "mobile"
+                                ]
+                            },
+                            "example": {
+                                "mobile": "13800138000"
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/认证"
+            }
+        },
+        "/api/v1/auth/login": {
+            "post": {
+                "tags": [
+                    "认证"
+                ],
+                "summary": "手机号验证码登录",
+                "operationId": "post.api.v1.auth.login",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "登录成功",
+                                    "data": {
+                                        "access_token": "1|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                                        "refresh_token": "2|yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+                                        "expires_at": 1766000000
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "mobile": {
+                                        "type": "string",
+                                        "description": "手机号",
+                                        "example": "13800138000"
+                                    },
+                                    "code": {
+                                        "type": "string",
+                                        "description": "短信验证码",
+                                        "example": "123456"
+                                    }
+                                },
+                                "required": [
+                                    "mobile",
+                                    "code"
+                                ]
+                            },
+                            "example": {
+                                "mobile": "13800138000",
+                                "code": "123456"
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/认证",
+                "description": "登录成功后返回 access_token 和 refresh_token。Apifox 在登录接口「后置操作」中提取 $.data.access_token 到环境变量 app_access_token、$.data.refresh_token 到环境变量 app_refresh_token，其他前台接口通过 Authorization: Bearer {{app_access_token}} 自动携带；调用刷新接口时使用 Authorization: Bearer {{app_refresh_token}}。"
+            }
+        },
+        "/api/v1/refresh-token": {
+            "post": {
+                "tags": [
+                    "认证"
+                ],
+                "summary": "刷新 Token",
+                "operationId": "post.api.v1.refresh-token",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppRefreshAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/LoginResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "access_token": "3|xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+                                        "refresh_token": "4|yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy",
+                                        "expires_at": 1766000000
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/认证"
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "认证"
+                ],
+                "summary": "退出登录",
+                "operationId": "post.api.v1.logout",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "退出成功",
+                                    "data": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/认证"
+            }
+        },
+        "/api/v1/user-info": {
+            "get": {
+                "tags": [
+                    "认证"
+                ],
+                "summary": "获取当前登录用户信息",
+                "operationId": "get.api.v1.user-info",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/认证"
+            }
+        },
         "/api/v1/test": {
             "get": {
                 "tags": [
@@ -5232,11 +5479,11 @@
                         "properties": {
                             "access_token": {
                                 "type": "string",
-                                "description": "接口访问 Token，后续请求放入 Authorization: Bearer {access_token}"
+                                "description": "接口访问 Token。后台放入 Authorization: Bearer {{access_token}}，App 放入 Authorization: Bearer {{app_access_token}}"
                             },
                             "refresh_token": {
                                 "type": "string",
-                                "description": "刷新 Token"
+                                "description": "刷新 Token（仅刷新接口使用）。后台使用 Authorization: Bearer {{refresh_token}}，App 使用 Authorization: Bearer {{app_refresh_token}}"
                             },
                             "expires_at": {
                                 "type": "integer",
@@ -5258,15 +5505,48 @@
             }
         },
         "parameters": {
-            "Authorization": {
+            "AdminAuthorization": {
                 "name": "Authorization",
                 "in": "header",
                 "required": true,
-                "description": "登录接口返回的 access_token，格式：Bearer {{access_token}}",
+                "description": "后台登录接口返回的 access_token，格式：Bearer {{access_token}}",
                 "example": "Bearer {{access_token}}",
                 "schema": {
                     "type": "string",
                     "default": "Bearer {{access_token}}"
+                }
+            },
+            "AdminRefreshAuthorization": {
+                "name": "Authorization",
+                "in": "header",
+                "required": true,
+                "description": "后台登录接口返回的 refresh_token（仅刷新接口使用），格式：Bearer {{refresh_token}}",
+                "example": "Bearer {{refresh_token}}",
+                "schema": {
+                    "type": "string",
+                    "default": "Bearer {{refresh_token}}"
+                }
+            },
+            "AppAuthorization": {
+                "name": "Authorization",
+                "in": "header",
+                "required": true,
+                "description": "App 登录接口返回的 access_token，格式：Bearer {{app_access_token}}",
+                "example": "Bearer {{app_access_token}}",
+                "schema": {
+                    "type": "string",
+                    "default": "Bearer {{app_access_token}}"
+                }
+            },
+            "AppRefreshAuthorization": {
+                "name": "Authorization",
+                "in": "header",
+                "required": true,
+                "description": "App 登录接口返回的 refresh_token（仅刷新接口使用），格式：Bearer {{app_refresh_token}}",
+                "example": "Bearer {{app_refresh_token}}",
+                "schema": {
+                    "type": "string",
+                    "default": "Bearer {{app_refresh_token}}"
                 }
             }
         }

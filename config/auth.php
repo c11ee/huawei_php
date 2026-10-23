@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Auth\AppUser;
 use App\Models\System\User;
 
 return [
@@ -42,9 +43,15 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        // 后台（管理端）
         'sanctum' => [
             'driver' => 'sanctum',
             'provider' => 'users',
+        ],
+        // 前台（用户端）
+        'app' => [
+            'driver' => 'sanctum',
+            'provider' => 'app_users',
         ],
     ],
 
@@ -66,9 +73,16 @@ return [
     */
 
     'providers' => [
+        // 后台用户
         'users' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', User::class),
+        ],
+
+        // 前台用户
+        'app_users' => [
+            'driver' => 'eloquent',
+            'model' => AppUser::class,
         ],
 
         // 'users' => [

@@ -7,6 +7,7 @@ use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\System\User;
+use App\Traits\TokenTrait;
 use App\Traits\TreeTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +15,7 @@ use Spatie\Permission\Models\Permission;
 
 class AuthController extends Controller
 {
-    use  TreeTrait;
+    use TokenTrait, TreeTrait;
 
     public function login(Request $request)
     {
@@ -36,42 +37,26 @@ class AuthController extends Controller
             return ApiResponse::error('用户名或密码错误');
         }
 
-        if ($user->status != 1) {
-            return ApiResponse::error('用户已禁用');
+        if ($user && $user->status == 0) {
+            return ApiResponse::error('用户已被禁用');
         }
 
-        // 有效期较短的 token
-        $accessTokenInstance = $user->createToken('access_token', ['access-api'], now()->addDays(1));
-        // 生成 Token (plainTextToken 是纯文本字符串)
-        $accessToken = $accessTokenInstance->plainTextToken;
-
-        // 有效期较长的 token
-        $refreshTokenInstance = $user->createToken('refresh_token', ['refresh-token'], now()->addDays(7));
-        $refreshToken = $refreshTokenInstance->plainTextToken;
-
-        return ApiResponse::success([
-            'access_token' => $accessToken,
-            'refresh_token' => $refreshToken,
-            'expires_at' => now()->addDays(1)->timestamp,
-        ], '登录成功');
+        return ApiResponse::success($this->issueTokens($user), '登录成功');
     }
 
     public function refreshToken(Request $request)
     {
         $user = $request->user();
 
-        // 可选：删除当前使用的 refresh token（一次性使用）
+        if ($user->status == 0) {
+            return ApiResponse::error('用户已被禁用');
+        }
+
+        // 删除当前使用的 refresh token（不可重复使用），其他设备会话不受影响
         $request->user()->currentAccessToken()->delete();
 
         // 重新颁发新的短效 Access Token + 长效 Refresh Token
-        $newAccessToken = $user->createToken('access_token', ['access-api'], now()->addDays(1))->plainTextToken;
-        $newRefreshToken = $user->createToken('refresh_token', ['refresh-token'], now()->addDays(7))->plainTextToken;
-
-        return ApiResponse::success([
-            'access_token' => $newAccessToken,
-            'refresh_token' => $newRefreshToken,
-            'expires_at' => now()->addDays(1)->timestamp,
-        ]);
+        return ApiResponse::success($this->issueTokens($user));
     }
 
     public function logout(Request $request)
@@ -82,10 +67,6 @@ class AuthController extends Controller
             // 删除当前 Token
             $user->currentAccessToken()->delete();
         }
-
-
-        // Auth::logout();
-
 
         return ApiResponse::success([], '退出成功');
     }

@@ -6,6 +6,8 @@
  *
  * 用法：
  *   php scripts/upload-apifox.php [apifox/openapi.json] [选项]
+ *   (覆盖已存在接口目录)
+ *   php scripts/upload-apifox.php apifox/openapi.json --overwrite=OVERWRITE_EXISTING
  *
  * 选项：
  *   --token=        Apifox 访问令牌，默认读取 .env 的 APIFOX_ACCESS_TOKEN

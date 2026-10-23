@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    'alipay' => [
+        'app_id' => env('ALIPAY_APP_ID'),
+        'pid' => env('ALIPAY_PID'), // 沙箱控制台的 PID
+        'private_key' => env('ALIPAY_PRIVATE_KEY'), // 你的应用私钥
+        'alipay_public_key' => env('ALIPAY_PUBLIC_KEY'), // 支付宝公钥（沙箱的）
+        'gateway' => env('ALIPAY_GATEWAY_URL'), // 支付宝网关地址
+    ],
+
+    'aliyun_dypns' => [
+        'access_key_id' => env('ALIYUN_ACCESS_KEY_ID'),
+        'access_key_secret' => env('ALIYUN_ACCESS_KEY_SECRET'),
+        // local 环境使用的固定验证码，配置后不再真实发送短信
+        'test_code' => env('ALIYUN_DYPNS_TEST_CODE'),
+    ],
 ];
