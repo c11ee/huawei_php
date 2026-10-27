@@ -5198,11 +5198,16 @@
                                     "code": 200,
                                     "msg": "ok",
                                     "data": {
-                                        "country": "中国",
-                                        "province": "上海市",
-                                        "city": "上海市",
-                                        "district": "黄浦区",
-                                        "address": "人民大道200号"
+                                            "country": "中国",
+                                            "province": "上海",
+                                            "province_id": 9,
+                                            "city": "上海",
+                                            "city_id": 108,
+                                            "district": "黄浦",
+                                            "district_id": 1130,
+                                            "township": "南京东路",
+                                            "township_id": 12430,
+                                            "address": "上海市黄浦区南京东路街道上海市人民政府"
                                     }
                                 }
                             }
@@ -5362,15 +5367,19 @@
                                     "code": 200,
                                     "msg": "ok",
                                     "data": {
-                                        "prov": "广东省",
-                                        "city": "深圳市",
-                                        "district": "龙华区",
-                                        "town": "龙华街道",
-                                        "poi_info": "宝湖新村",
-                                        "house_info": "45栋",
-                                        "addr_info": "宝湖新村45栋",
-                                        "per": "张先生",
-                                        "tel": "13800138000"
+                                            "house_info": "45栋",
+                                            "poi_info": "宝湖新村",
+                                            "town": "龙华街道",
+                                            "city": "深圳市",
+                                            "district": "龙华区",
+                                            "tel": "13800138000",
+                                            "addr_info": "宝湖新村45栋",
+                                            "per": "张先生",
+                                            "prov": "广东省",
+                                            "prov_id": 19,
+                                            "city_id": 236,
+                                            "district_id": 2164,
+                                            "town_id": 27314
                                     }
                                 }
                             }

@@ -44,29 +44,6 @@ class AmapService
         return $pois;
     }
 
-    /** 地理编码 */
-    public function geocode(string $address): ?array
-    {
-        try {
-            $response = Http::timeout(5)
-                ->get($this->url . '/v3/geocode/geo', [
-                    'key'     => config('services.amap.key'),
-                    'address' => $address,
-                ]);
-        } catch (Throwable $e) {
-            Log::error('高德地理编码请求失败:' . $e->getMessage());
-            return null;
-        }
-
-        if ($response->failed() || (string) $response->json('status') !== '1') {
-            Log::error('高德地理编码返回异常:' . $response->body());
-            return null;
-        }
-
-        $geocodes = $response->json('geocodes', []);
-        return $geocodes;
-    }
-
     /**
      * 经纬度逆地理编码
      *
@@ -95,12 +72,12 @@ class AmapService
         $component = $regeocode['addressComponent'] ?? [];
 
         // 高德无对应数据时会把 adcode/towncode 返回为空数组，先统一成字符串
-        $district = $this->findArea($this->toCode($component['adcode'] ?? null));
-        $township = $this->findArea($this->toCode($component['towncode'] ?? null));
+        $district = SysArea::findArea($this->toCode($component['adcode'] ?? null));
+        $township = SysArea::findArea($this->toCode($component['towncode'] ?? null));
 
         // 市、省逐级按 parent_id 上溯，任一层级缺失时后续为 null，不再触发空指针
-        $city = $this->findAreaById($district?->parent_id);
-        $province = $this->findAreaById($city?->parent_id);
+        $city = SysArea::findAreaById($district?->parent_id);
+        $province = SysArea::findAreaById($city?->parent_id);
 
         return [
             'country'     => $component['country'] ?? '',
@@ -114,36 +91,6 @@ class AmapService
             'township_id' => $township?->id ?? '',
             'address'     => $regeocode['formatted_address'] ?? '',
         ];
-    }
-
-    /**
-     * 按高德编码查询行政区划
-     */
-    private function findArea(string|int|null $code): ?SysArea
-    {
-        $code = (string) $code;
-
-        // 空编码或顶级 parent_id = 0（省再往上没有节点）直接跳过查询
-        if ($code === '' || $code === '0') {
-            return null;
-        }
-
-        return SysArea::query()
-            // ext_id 为 12 位标准编码，短编码在右侧补 0 对齐
-            ->where('ext_id', str_pad($code, 12, '0'))
-            ->first(['id', 'parent_id', 'name']);
-    }
-
-    /**
-     * 按主键 id 查询行政区划（用于 parent_id 逐级上溯）
-     */
-    private function findAreaById(?int $id): ?SysArea
-    {
-        if (! $id) {
-            return null;
-        }
-
-        return SysArea::find($id, ['id', 'parent_id', 'name']);
     }
 
     /**
