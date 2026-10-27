@@ -43,10 +43,16 @@ return [
         'gateway' => env('ALIPAY_GATEWAY_URL'), // 支付宝网关地址
     ],
 
-    'aliyun_dypns' => [
+    'aliyun' => [
         'access_key_id' => env('ALIYUN_ACCESS_KEY_ID'),
         'access_key_secret' => env('ALIYUN_ACCESS_KEY_SECRET'),
+        'address_purification_project_id' => env('ALIYUN_ADDRESS_PURIFICATION_PROJECT_ID'),
         // local 环境使用的固定验证码，配置后不再真实发送短信
         'test_code' => env('ALIYUN_DYPNS_TEST_CODE'),
+    ],
+
+    'amap' => [
+        'key' => env('AMAP_KEY'),
+        'url' => env('AMAP_API_URL', 'https://restapi.amap.com'),
     ],
 ];

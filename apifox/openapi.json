@@ -5,12 +5,6 @@
         "version": "1.0.0",
         "description": "由 php artisan apifox:sync 自动生成"
     },
-    "servers": [
-        {
-            "url": "http://hdec967a.natappfree.cc",
-            "description": "开发环境（natapp）"
-        }
-    ],
     "tags": [
         {
             "name": "认证管理"
@@ -56,6 +50,9 @@
         },
         {
             "name": "商品"
+        },
+        {
+            "name": "地址"
         },
         {
             "name": "认证"
@@ -5161,13 +5158,756 @@
                 "x-apifox-folder": "前台/商品"
             }
         },
-        "/api/v1/auth/sendLoginCode": {
+        "/api/v1/address/reverse-geocode": {
+            "post": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "经纬度逆地理编码",
+                "operationId": "post.api.v1.address.reverse-geocode",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "location": {
+                                        "type": "string",
+                                        "pattern": "^-?\\d{1,3}(?:\\.\\d+)?,-?\\d{1,2}(?:\\.\\d+)?$",
+                                        "description": "经纬度，格式：经度,纬度",
+                                        "example": "121.473701,31.230416"
+                                    }
+                                },
+                                "required": [
+                                    "location"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "country": "中国",
+                                        "province": "上海市",
+                                        "city": "上海市",
+                                        "district": "黄浦区",
+                                        "address": "人民大道200号"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/address/search-poi": {
+            "post": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "搜索POI 2.0",
+                "operationId": "post.api.v1.address.search-poi",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "city_name": {
+                                        "type": "string",
+                                        "description": "城市名称（中文）",
+                                        "example": "上海市"
+                                    },
+                                    "keyword": {
+                                        "type": "string",
+                                        "minLength": 1,
+                                        "maxLength": 80,
+                                        "description": "搜索关键字",
+                                        "example": "人民广场"
+                                    },
+                                    "limit": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "maximum": 25,
+                                        "description": "每页条数，1-25",
+                                        "example": 10
+                                    }
+                                },
+                                "required": [
+                                    "city_name",
+                                    "keyword",
+                                    "limit"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": [
+                                        {
+                                            "poi_id": "B0FFH8RBU7",
+                                            "name": "人民广场",
+                                            "address": "西藏中路与人民大道交叉口",
+                                            "location": "121.473701,31.230416"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/address/extract-express": {
+            "post": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "物流面单信息提取",
+                "description": "从非结构化文本中提取收货人姓名、电话、省市区、街道及详细地址（阿里云地址标准化 ExtractExpress）。",
+                "operationId": "post.api.v1.address.extract-express",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "address": {
+                                        "type": "string",
+                                        "description": "待提取的地址文本",
+                                        "example": "收货人：张先生；手机号码：13800138000；所在地区：广东省深圳市龙华区龙华街道；详细地址：宝湖新村45栋"
+                                    }
+                                },
+                                "required": [
+                                    "address"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "prov": "广东省",
+                                        "city": "深圳市",
+                                        "district": "龙华区",
+                                        "town": "龙华街道",
+                                        "poi_info": "宝湖新村",
+                                        "house_info": "45栋",
+                                        "addr_info": "宝湖新村45栋",
+                                        "per": "张先生",
+                                        "tel": "13800138000"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "从地址提取快递信息失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/address": {
+            "get": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "用户地址列表",
+                "operationId": "get.api.v1.address",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "user_id": 1,
+                                            "is_default": 1,
+                                            "mobile": "13800138000",
+                                            "name": "张三",
+                                            "province_id": 310000,
+                                            "city_id": 310100,
+                                            "district_id": 310101,
+                                            "township_id": 310101001,
+                                            "province_name": "上海市",
+                                            "city_name": "上海市",
+                                            "district_name": "黄浦区",
+                                            "township_name": "南京东路街道",
+                                            "address": "人民大道200号",
+                                            "created_at": "2026-10-24 10:44:38",
+                                            "updated_at": "2026-10-24 10:44:38",
+                                            "created_at_ts": 1761273878,
+                                            "updated_at_ts": 1761273878
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            },
+            "post": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "新增用户地址",
+                "description": "用户第一条地址会自动设为默认地址；is_default 为 1 时会将其他地址的默认标记清除。",
+                "operationId": "post.api.v1.address",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 64,
+                                        "description": "收货人姓名",
+                                        "example": "张三"
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "pattern": "^1[3-9]\\d{9}$",
+                                        "description": "手机号",
+                                        "example": "13800138000"
+                                    },
+                                    "province_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "省份ID（sys_area.id）",
+                                        "example": 310000
+                                    },
+                                    "city_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "城市ID（sys_area.id）",
+                                        "example": 310100
+                                    },
+                                    "district_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "区县ID（sys_area.id）",
+                                        "example": 310101
+                                    },
+                                    "township_id": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "乡镇/街道ID（sys_area.id），0 表示未匹配",
+                                        "default": 0,
+                                        "example": 310101001
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "详细地址",
+                                        "example": "人民大道200号"
+                                    },
+                                    "is_default": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "default": 0,
+                                        "description": "是否默认地址 0: 否 1: 是",
+                                        "example": 0
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "mobile",
+                                    "province_id",
+                                    "city_id",
+                                    "district_id",
+                                    "address"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "is_default": 1,
+                                        "mobile": "13800138000",
+                                        "name": "张三",
+                                        "province_id": 310000,
+                                        "city_id": 310100,
+                                        "district_id": 310101,
+                                        "township_id": 310101001,
+                                        "province_name": "上海市",
+                                        "city_name": "上海市",
+                                        "district_name": "黄浦区",
+                                        "township_name": "南京东路街道",
+                                        "address": "人民大道200号",
+                                        "created_at": "2026-10-24 10:44:38",
+                                        "updated_at": "2026-10-24 10:44:38",
+                                        "created_at_ts": 1761273878,
+                                        "updated_at_ts": 1761273878
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/address/set-default/{id}": {
+            "put": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "设置默认地址",
+                "description": "将该地址设为默认，同时清除当前用户其他地址的默认标记。",
+                "operationId": "put.api.v1.address.set-default.id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "地址 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "地址不存在",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/address/{id}": {
+            "put": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "更新用户地址",
+                "description": "全量更新，所有必填字段需完整提交；is_default 为 1 时会将其他地址的默认标记清除。",
+                "operationId": "put.api.v1.address.id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "地址 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "maxLength": 64,
+                                        "description": "收货人姓名",
+                                        "example": "张三"
+                                    },
+                                    "mobile": {
+                                        "type": "string",
+                                        "pattern": "^1[3-9]\\d{9}$",
+                                        "description": "手机号",
+                                        "example": "13800138000"
+                                    },
+                                    "province_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "省份ID（sys_area.id）",
+                                        "example": 310000
+                                    },
+                                    "city_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "城市ID（sys_area.id）",
+                                        "example": 310100
+                                    },
+                                    "district_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "区县ID（sys_area.id）",
+                                        "example": 310101
+                                    },
+                                    "township_id": {
+                                        "type": "integer",
+                                        "minimum": 0,
+                                        "description": "乡镇/街道ID（sys_area.id），0 表示未匹配",
+                                        "default": 0,
+                                        "example": 310101001
+                                    },
+                                    "address": {
+                                        "type": "string",
+                                        "maxLength": 255,
+                                        "description": "详细地址",
+                                        "example": "人民大道200号"
+                                    },
+                                    "is_default": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "default": 0,
+                                        "description": "是否默认地址 0: 否 1: 是",
+                                        "example": 0
+                                    }
+                                },
+                                "required": [
+                                    "name",
+                                    "mobile",
+                                    "province_id",
+                                    "city_id",
+                                    "district_id",
+                                    "address"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "is_default": 0,
+                                        "mobile": "13800138000",
+                                        "name": "张三",
+                                        "province_id": 310000,
+                                        "city_id": 310100,
+                                        "district_id": 310101,
+                                        "township_id": 310101001,
+                                        "province_name": "上海市",
+                                        "city_name": "上海市",
+                                        "district_name": "黄浦区",
+                                        "township_name": "南京东路街道",
+                                        "address": "人民大道200号",
+                                        "created_at": "2026-10-24 10:44:38",
+                                        "updated_at": "2026-10-24 11:00:00",
+                                        "created_at_ts": 1761273878,
+                                        "updated_at_ts": 1761274800
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "地址不存在",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            },
+            "delete": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "删除用户地址",
+                "operationId": "delete.api.v1.address.id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "地址 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "地址不存在",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/auth/send-login-code": {
             "post": {
                 "tags": [
                     "认证"
                 ],
                 "summary": "发送登录短信验证码",
-                "operationId": "post.api.v1.auth.sendLoginCode",
+                "operationId": "post.api.v1.auth.send-login-code",
                 "parameters": [],
                 "responses": {
                     "200": {

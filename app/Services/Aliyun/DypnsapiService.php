@@ -1,8 +1,7 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Aliyun;
 
-use AlibabaCloud\Dara\Dara;
 use AlibabaCloud\SDK\Dypnsapi\V20170525\Dypnsapi;
 use AlibabaCloud\SDK\Dypnsapi\V20170525\Models\CheckSmsVerifyCodeRequest;
 use AlibabaCloud\SDK\Dypnsapi\V20170525\Models\SendSmsVerifyCodeRequest;
@@ -10,21 +9,15 @@ use Darabonba\OpenApi\Models\Config;
 use Exception;
 use Illuminate\Support\Facades\Log;
 
-class AliyunAuthService
+class DypnsapiService
 {
     protected Dypnsapi $client;
 
     public function __construct()
     {
-        // 本地 PHP 未配置 curl.cainfo，显式指定 CA 证书，避免 cURL error 60
-        $caBundle = base_path('apifox/cacert.pem');
-        if (is_file($caBundle)) {
-            Dara::config(['verify' => $caBundle]);
-        }
-
         $config = new Config([
-            'accessKeyId' => config('services.aliyun_dypns.access_key_id'),
-            'accessKeySecret' => config('services.aliyun_dypns.access_key_secret'),
+            'accessKeyId' => config('services.aliyun.access_key_id'),
+            'accessKeySecret' => config('services.aliyun.access_key_secret'),
         ]);
         // 访问的域名
         $config->endpoint = 'dypnsapi.aliyuncs.com';
@@ -40,7 +33,7 @@ class AliyunAuthService
             return null;
         }
 
-        $code = config('services.aliyun_dypns.test_code');
+        $code = config('services.aliyun.test_code');
 
         return $code ? (string) $code : null;
     }

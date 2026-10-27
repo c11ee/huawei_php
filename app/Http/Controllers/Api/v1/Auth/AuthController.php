@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Auth\AppUser;
 use App\Models\Auth\AppUserAuth;
-use App\Services\AliyunAuthService;
+use App\Services\Aliyun\DypnsapiService;
 use App\Traits\TokenTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,9 +15,9 @@ class AuthController extends Controller
 {
     use TokenTrait;
 
-    protected AliyunAuthService $authService;
+    protected DypnsapiService $authService;
 
-    public function __construct(AliyunAuthService $authService)
+    public function __construct(DypnsapiService $authService)
     {
         $this->authService = $authService;
     }
