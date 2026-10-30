@@ -41,7 +41,17 @@ class AmapService
         }
 
         $pois = $response->json('pois', []);
-        return $pois;
+
+        // 只保留业务需要的字段，不把高德原始结构透传给前端
+        return array_map(fn(array $poi) => [
+            'id'       => $poi['id'] ?? '',
+            'location' => $poi['location'] ?? '',
+            'name'     => $poi['name'] ?? '',
+            'address'  => $poi['address'] ?? '',
+            'pname'    => $poi['pname'] ?? '',
+            'cityname' => $poi['cityname'] ?? '',
+            'adname'   => $poi['adname'] ?? '',
+        ], $pois);
     }
 
     /**

@@ -35,6 +35,11 @@ Route::prefix('api')->group(function () {
         // 经纬度逆地理编码
         Route::post('address/reverse-geocode', [AddressController::class, 'reverseGeocode'])->middleware('throttle:30,1');
 
+        // 省市区数据
+        Route::get('address/area', [AddressController::class, 'getArea']);
+        // 热门城市
+        Route::get('address/hot-cities', [AddressController::class, 'getHotCities']);
+
         // 认证
         Route::prefix('auth')->group(function () {
             // 短信验证码接口限制频率，防止被刷
@@ -60,6 +65,7 @@ Route::prefix('api')->group(function () {
 
                 // 用户地址管理
                 Route::get('/', [AddressController::class, 'index']);
+                Route::get('/{id}', [AddressController::class, 'show']);
                 Route::post('/', [AddressController::class, 'store']);
                 Route::put('/set-default/{id}', [AddressController::class, 'setDefault']);
                 Route::put('/{id}', [AddressController::class, 'update']);

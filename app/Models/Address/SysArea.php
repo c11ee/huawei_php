@@ -3,12 +3,21 @@
 namespace App\Models\Address;
 
 use App\Models\BaseModel;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SysArea extends BaseModel
 {
     protected $table = 'sys_area';
 
     protected $guarded = [];
+
+    /**
+     * 父级行政区划
+     */
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(SysArea::class, 'parent_id');
+    }
 
     /**
      * 使用 ext_name 查询行政区划

@@ -27,6 +27,8 @@ return new class extends Migration
 
             $table->index('parent_id', 'idx_parent_id');
             $table->index('ext_id', 'idx_ext_id');
+            $table->index(['parent_id', 'status'], 'idx_parent_id_status');
+            $table->index(['ext_name', 'parent_id', 'status'], 'idx_ext_name_parent_status');
         });
     }
 

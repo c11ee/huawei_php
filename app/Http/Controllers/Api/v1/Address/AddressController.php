@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Api\v1\Address;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
+use App\Models\Address\SysArea;
 use App\Services\Aliyun\AddresspurificationService;
 use App\Services\AmapService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class AddressController extends Controller
@@ -40,9 +42,9 @@ class AddressController extends Controller
 
         $result = $amap->searchPoi($validated);
 
-        if (!$result) {
-            return ApiResponse::error('搜索POI失败', 500);
-        }
+        // if (!$result) {
+        //     return ApiResponse::error('搜索POI失败', 500);
+        // }
 
         return ApiResponse::success($result);
     }
@@ -58,6 +60,60 @@ class AddressController extends Controller
         if (!$result) {
             return ApiResponse::error('从地址提取快递信息失败', 500);
         }
+
+        return ApiResponse::success($result);
+    }
+
+    /** 返回省市区数据 */
+    public function getArea(Request $request)
+    {
+        $validated = $request->validate([
+            'parent_id' => 'nullable|integer|min:0',
+        ]);
+        $parentId = (int) ($validated['parent_id'] ?? 0);
+
+        $cacheKey = "sys_area:children:parent_{$parentId}";
+
+        $result = Cache::tags('sys_area')->remember($cacheKey, now()->addDay(), function () use ($parentId) {
+            return SysArea::where('parent_id', $parentId)->where('status', 1)->select('id', 'parent_id', 'name')->get();
+        });
+
+        return ApiResponse::success($result);
+    }
+
+    /** 热门城市 */
+    public function getHotCities()
+    {
+        // 按展示顺序维护，使用 12 位国标编码匹配，避免同名城市误命中
+        $hotCityCodes = [
+            '110100000000', // 北京
+            '310100000000', // 上海
+            '440100000000', // 广州
+            '440300000000', // 深圳
+            '330100000000', // 杭州
+            '510100000000', // 成都
+            '420100000000', // 武汉
+            '610100000000', // 西安
+        ];
+
+        $order = array_flip($hotCityCodes);
+        $result = Cache::tags('sys_area')->remember('sys_area:hot_cities', now()->addDay(), function () use ($hotCityCodes, $order) {
+            return  SysArea::where('level', 1)
+                ->where('status', 1)
+                ->whereIn('ext_id', $hotCityCodes)
+                ->select('id', 'parent_id', 'name', 'ext_id')
+                // 预加载所属省份，避免序列化时逐条查询
+                ->with('parent:id,name')
+                ->get()
+                ->sortBy(fn(SysArea $area) => $order[$area->ext_id] ?? PHP_INT_MAX)
+                ->map(fn(SysArea $area) => [
+                    'city_id'       => $area->id,
+                    'city_name'     => $area->name,
+                    'province_id'   => $area->parent_id,
+                    'province_name' => $area->parent?->name ?? '',
+                ])
+                ->values();
+        });
 
         return ApiResponse::success($result);
     }

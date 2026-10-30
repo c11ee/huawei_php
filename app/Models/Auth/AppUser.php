@@ -26,6 +26,6 @@ class AppUser extends Authenticatable
      */
     public function addresses()
     {
-        return $this->hasMany(AppAddress::class, 'user_id', 'id');
+        return $this->hasMany(AppAddress::class, 'user_id', 'id')->orderBy('is_default', 'desc');
     }
 }

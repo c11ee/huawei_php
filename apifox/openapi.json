@@ -5227,6 +5227,106 @@
                 "x-apifox-folder": "前台/地址"
             }
         },
+        "/api/v1/address/area": {
+            "get": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "获取省市区数据",
+                "description": "按 parent_id 逐级获取下级行政区划：parent_id 传 0 或不传返回省级，传省级 id 返回市，传市级 id 返回区县，传区县 id 返回街道。仅返回启用（status=1）的区划，无需登录。",
+                "operationId": "get.api.v1.address.area",
+                "parameters": [
+                    {
+                        "name": "parent_id",
+                        "in": "query",
+                        "required": false,
+                        "description": "父级行政区划ID（sys_area.id），0 或不传表示查询省级",
+                        "schema": {
+                            "type": "integer",
+                            "minimum": 0,
+                            "default": 0
+                        },
+                        "example": 0
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": [
+                                        {
+                                            "id": 1,
+                                            "parent_id": 0,
+                                            "name": "北京"
+                                        },
+                                        {
+                                            "id": 2,
+                                            "parent_id": 0,
+                                            "name": "天津"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
+        "/api/v1/address/hot-cities": {
+            "get": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "获取热门城市",
+                "description": "返回预设的热门城市列表，按预设顺序排列，仅返回启用（status=1）的市级区划，无需登录。city_id / city_name 为城市ID与名称，province_id / province_name 为所属省份ID与名称，可直接用于地址表单的省份、城市选择。",
+                "operationId": "get.api.v1.address.hot-cities",
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": [
+                                        {
+                                            "city_id": 36,
+                                            "city_name": "北京",
+                                            "province_id": 1,
+                                            "province_name": "北京"
+                                        },
+                                        {
+                                            "city_id": 108,
+                                            "city_name": "上海",
+                                            "province_id": 9,
+                                            "province_name": "上海"
+                                        },
+                                        {
+                                            "city_id": 234,
+                                            "city_name": "广州",
+                                            "province_id": 19,
+                                            "province_name": "广东"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            }
+        },
         "/api/v1/address/search-poi": {
             "post": {
                 "tags": [
@@ -5288,10 +5388,13 @@
                                     "msg": "ok",
                                     "data": [
                                         {
-                                            "poi_id": "B0FFH8RBU7",
-                                            "name": "人民广场",
-                                            "address": "西藏中路与人民大道交叉口",
-                                            "location": "121.473701,31.230416"
+                                            "id": "BV10245836",
+                                            "location": "114.094649,22.561941",
+                                            "name": "八卦岭(地铁站)",
+                                            "address": "6号线/光明线;7号线/西丽线",
+                                            "pname": "广东省",
+                                            "cityname": "深圳市",
+                                            "adname": "福田区"
                                         }
                                     ]
                                 }
@@ -5688,6 +5791,85 @@
             }
         },
         "/api/v1/address/{id}": {
+            "get": {
+                "tags": [
+                    "地址"
+                ],
+                "summary": "获取用户地址详情",
+                "description": "按地址 ID 查询当前用户的地址详情，返回字段包含省市区街道名称（province_name / city_name / district_name / township_name）。仅能查看本人地址，地址不存在或不属于当前用户时返回 404。",
+                "operationId": "get.api.v1.address.id",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "地址 ID",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "id": 1,
+                                        "user_id": 1,
+                                        "is_default": 0,
+                                        "mobile": "13800138000",
+                                        "name": "张三",
+                                        "province_id": 310000,
+                                        "city_id": 310100,
+                                        "district_id": 310101,
+                                        "township_id": 310101001,
+                                        "province_name": "上海市",
+                                        "city_name": "上海市",
+                                        "district_name": "黄浦区",
+                                        "township_name": "南京东路街道",
+                                        "address": "人民大道200号",
+                                        "created_at": "2026-10-24 10:44:38",
+                                        "updated_at": "2026-10-24 11:00:00",
+                                        "created_at_ts": 1761273878,
+                                        "updated_at_ts": 1761274800
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "地址不存在",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/地址"
+            },
             "put": {
                 "tags": [
                     "地址"
