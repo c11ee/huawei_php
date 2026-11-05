@@ -76,18 +76,7 @@ class CartController extends Controller
         // 单次加购数量不能超过可用库存
         $quantity = min($validated['num'], $available);
 
-        $snapshot = [
-            'spu_id'     => $sku->spu_id,
-            'spu_name'   => $spu->product_name ?? '',
-            'sku_name'   => $sku->name,
-            'image_url'  => $sku->image_url ?: ($spu->default_sku_image_url ?? ''),
-            'sale_price' => $sku->sale_price,
-            'sku_specs'  => $sku->sku_specs,
-            'brand_id'   => $spu->brand_id ?? 0,
-            'brand_name' => $spu->brand?->name ?? '',
-            'brand_logo' => $spu->brand?->logo ?? '',
-            'stock'      => $sku->stock,
-        ];
+        $snapshot = $this->buildSnapshot($sku);
 
         $cartItem = $request->user()->cartItems()->where('sku_id', $sku->id)->first();
 
@@ -180,9 +169,84 @@ class CartController extends Controller
         return ApiResponse::success([]);
     }
 
-    /** 
-     * 切换规格, 需要注意,可能切换为已添加购物车的 sku, 这时需要更新购物车数量
+    /**
+     * 切换规格
+     * 目标 SKU 可能已在本用户购物车中, 此时不新增记录, 而是合并数量并删除当前项
      */
+    public function updateSpec(Request $request)
+    {
+        $validated = $request->validate([
+            'cart_id' => ['required', 'integer'],
+            'sku_id'  => ['required', 'integer'],
+        ]);
+
+        $user     = $request->user();
+        $cartItem = $user->cartItems()->findOrFail($validated['cart_id']);
+
+        // 规格未变化, 直接返回当前数量
+        if ((int) $cartItem->sku_id === (int) $validated['sku_id']) {
+            return ApiResponse::success([
+                'cart_id'  => $cartItem->id,
+                'quantity' => $cartItem->quantity,
+                'merged'   => false,
+            ]);
+        }
+
+        $sku = ProductSku::with(['spu.brand', 'specValues.spec'])->find($validated['sku_id']);
+        $spu = $sku?->spu;
+
+        if (!$sku || !$spu) {
+            return ApiResponse::error('商品不存在');
+        }
+
+        // 只能在同一个 SPU 内切换规格; SKU 已删除时用快照里的 spu_id 兜底
+        $snapshotSpuId = (int) (($cartItem->snapshot_json ?? [])['spu_id'] ?? 0);
+        $currentSpuId  = (int) ($cartItem->sku?->spu_id ?? $snapshotSpuId);
+        if ($currentSpuId && (int) $sku->spu_id !== $currentSpuId) {
+            return ApiResponse::error('只能切换到同一商品的其它规格');
+        }
+
+        // $spu 取不到说明 SPU 已删除; 与加购一致, 下架或删除都不可切换
+        if ($sku->status !== 1 || $spu->status !== 1) {
+            return ApiResponse::error('商品已下架');
+        }
+
+        // 可用库存 = 总库存 - 已锁定
+        $available = max(0, $sku->stock - $sku->locked_stock);
+        if ($available === 0) {
+            return ApiResponse::error('库存不足');
+        }
+
+        $snapshot = $this->buildSnapshot($sku);
+
+        [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot, $available) {
+            // 目标规格已在购物车: 合并数量(不超过可用库存)后删除当前项
+            $target = $user->cartItems()->where('sku_id', $sku->id)->lockForUpdate()->first();
+
+            if ($target) {
+                $quantity = min($target->quantity + $cartItem->quantity, $available);
+                $target->update(['quantity' => $quantity, 'snapshot_json' => $snapshot]);
+                $cartItem->delete();
+
+                return [$target->id, $quantity, true];
+            }
+
+            $quantity = min($cartItem->quantity, $available);
+            $cartItem->update([
+                'sku_id'        => $sku->id,
+                'quantity'      => $quantity,
+                'snapshot_json' => $snapshot,
+            ]);
+
+            return [$cartItem->id, $quantity, false];
+        });
+
+        return ApiResponse::success([
+            'cart_id'  => $targetId,
+            'quantity' => $quantity,
+            'merged'   => $merged,
+        ]);
+    }
 
     /** 删除购物车 */
     public function destroy(Request $request)
@@ -197,5 +261,24 @@ class CartController extends Controller
         $request->user()->cartItems()->whereIn('id', $ids)->delete();
 
         return ApiResponse::success([]);
+    }
+
+    /** 构建购物车商品快照, 商品被删除后用于兜底展示 */
+    private function buildSnapshot(ProductSku $sku): array
+    {
+        $spu = $sku->spu;
+
+        return [
+            'spu_id'     => $sku->spu_id,
+            'spu_name'   => $spu->product_name ?? '',
+            'sku_name'   => $sku->name,
+            'image_url'  => $sku->image_url ?: ($spu->default_sku_image_url ?? ''),
+            'sale_price' => $sku->sale_price,
+            'sku_specs'  => $sku->sku_specs,
+            'brand_id'   => $spu->brand_id ?? 0,
+            'brand_name' => $spu->brand?->name ?? '',
+            'brand_logo' => $spu->brand?->logo ?? '',
+            'stock'      => $sku->stock,
+        ];
     }
 }

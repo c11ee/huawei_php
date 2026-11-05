@@ -30,6 +30,7 @@ Route::prefix('api')->group(function () {
 
         // 商品管理
         Route::prefix('product')->group(function () {
+            Route::get('/spec-values/{sku_id}', [ProductController::class, 'getSpecValues']);
             Route::get('/{spu_id}', [ProductController::class, 'show']);
         });
 
@@ -79,6 +80,7 @@ Route::prefix('api')->group(function () {
                 Route::put('/checked', [CartController::class, 'updateChecked']);
                 Route::put('/quantity/{id}', [CartController::class, 'updateQuantity']);
                 Route::delete('/', [CartController::class, 'destroy']);
+                Route::put('/spec', [CartController::class, 'updateSpec']);
             });
         });
     });

@@ -5581,6 +5581,120 @@
                 "x-apifox-folder": "前台/搜索"
             }
         },
+        "/api/v1/product/spec-values/{sku_id}": {
+            "get": {
+                "tags": [
+                    "商品"
+                ],
+                "summary": "根据 SKU 获取可选规格项",
+                "operationId": "get.api.v1.product.spec-values.sku_id.",
+                "description": "购物车切换规格时使用：根据当前 SKU 找到所属 SPU，只返回 specs 规格树（含 values）与 skus SKU 列表（含 sku_specs 规格组合），前端据此渲染规格选择器、判断某个组合是否有货。SKU 的 cost_price 不返回。",
+                "parameters": [
+                    {
+                        "name": "sku_id",
+                        "in": "path",
+                        "required": true,
+                        "description": "SKU ID（product_sku.id）",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "specs": [
+                                            {
+                                                "id": 22,
+                                                "name": "颜色",
+                                                "is_image_required": 1,
+                                                "sort": 1,
+                                                "values": [
+                                                    {
+                                                        "id": 63,
+                                                        "value": "晨曦金",
+                                                        "image_url": "https://cdn.example.com/spec/63.png",
+                                                        "sort": 1
+                                                    },
+                                                    {
+                                                        "id": 64,
+                                                        "value": "曜石黑",
+                                                        "image_url": "https://cdn.example.com/spec/64.png",
+                                                        "sort": 2
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "skus": [
+                                            {
+                                                "id": 112,
+                                                "spu_id": 10,
+                                                "sku_code": "2601010586419",
+                                                "name": "HUAWEI Mate 80 Pro 晨曦金",
+                                                "is_default": 1,
+                                                "image_url": "https://cdn.example.com/images/m80-default.png",
+                                                "sale_price": "6999.00",
+                                                "strike_price": "7999.00",
+                                                "stock": 100,
+                                                "status": 1,
+                                                "sku_specs": [
+                                                    {
+                                                        "spec_id": 22,
+                                                        "spec_name": "颜色",
+                                                        "spec_value_id": 63,
+                                                        "spec_value": "晨曦金"
+                                                    }
+                                                ]
+                                            },
+                                            {
+                                                "id": 113,
+                                                "spu_id": 10,
+                                                "sku_code": "2601010586420",
+                                                "name": "HUAWEI Mate 80 Pro 曜石黑",
+                                                "is_default": 0,
+                                                "image_url": "https://cdn.example.com/images/m80-black.png",
+                                                "sale_price": "6999.00",
+                                                "strike_price": "7999.00",
+                                                "stock": 100,
+                                                "status": 1,
+                                                "sku_specs": [
+                                                    {
+                                                        "spec_id": 22,
+                                                        "spec_name": "颜色",
+                                                        "spec_value_id": 64,
+                                                        "spec_value": "曜石黑"
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "SKU 或其所属 SPU 不存在",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/商品"
+            }
+        },
         "/api/v1/product/{spu_id}": {
             "get": {
                 "tags": [
@@ -7221,6 +7335,99 @@
                     },
                     "422": {
                         "description": "参数校验失败（quantity 缺失或小于 1）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
+            }
+        },
+        "/api/v1/cart/spec": {
+            "put": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "切换购物车商品规格",
+                "operationId": "put.api.v1.cart.spec",
+                "description": "把购物车项从当前 SKU 切换到同一 SPU 下的另一个 SKU。规则：只能切到同一商品的其它规格；目标 SKU 必须上架且有可用库存（stock - locked_stock）；数量超过可用库存时截断。若目标规格已在本用户购物车中，则不新增记录，而是把两边数量合并到目标项（上限为可用库存）并删除当前项，此时返回 merged = true，cart_id 变为合并后的购物车项 ID。",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "cart_id",
+                                    "sku_id"
+                                ],
+                                "properties": {
+                                    "cart_id": {
+                                        "type": "integer",
+                                        "description": "购物车项 ID（app_cart_item.id）",
+                                        "example": 88
+                                    },
+                                    "sku_id": {
+                                        "type": "integer",
+                                        "description": "要切换到的 SKU ID（product_sku.id）",
+                                        "example": 113
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "切换成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "cart_id": 88,
+                                        "quantity": 3,
+                                        "merged": false
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "购物车项不存在或不属于当前用户",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（cart_id 或 sku_id 缺失、非整数）",
                         "content": {
                             "application/json": {
                                 "schema": {
