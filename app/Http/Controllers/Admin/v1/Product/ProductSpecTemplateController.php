@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\Product\ProductSpecTemplate;
-use App\Traits\BatchUpdateStatusTrait;
+use App\Traits\BatchOperationTrait;
 use Illuminate\Http\Request;
 
 class ProductSpecTemplateController extends Controller
 {
-    use BatchUpdateStatusTrait;
+    use BatchOperationTrait;
 
     /**
      * Display a listing of the resource.
@@ -65,20 +65,9 @@ class ProductSpecTemplateController extends Controller
     /**
      * 删除规格模板（支持逗号分隔批量删除，连同子孙规格模板一并删除）
      */
-    public function destroy(string $ids)
+    public function destroy(Request $request)
     {
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $ids)),
-            fn($v) => $v > 0
-        ));
-
-        if ($ids === []) {
-            return ApiResponse::error('参数错误');
-        }
-
-        ProductSpecTemplate::whereIn('id', array_values(array_unique($ids)))->delete();
-
-        return ApiResponse::success([], '删除成功');
+        return $this->batchDelete($request, ProductSpecTemplate::class);
     }
 
     /**

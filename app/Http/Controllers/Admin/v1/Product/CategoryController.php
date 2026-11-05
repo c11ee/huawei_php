@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Admin\v1\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Product\ProductCategory;
+use App\Traits\BatchOperationTrait;
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+    use BatchOperationTrait;
+
     /**
      * 分类列表（树形，不分页）
      */
@@ -83,25 +86,17 @@ class CategoryController extends Controller
     /**
      * 删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $id)),
-            fn($v) => $v > 0
-        ));
+        // 连同子孙分类一并删除
+        return $this->batchDelete($request, ProductCategory::class, function (array $ids) {
+            $deleteIds = [];
+            foreach ($ids as $categoryId) {
+                $deleteIds = array_merge($deleteIds, $this->descendantIds($categoryId));
+            }
 
-        if ($ids === []) {
-            return ApiResponse::error('参数错误');
-        }
-
-        $deleteIds = [];
-        foreach ($ids as $categoryId) {
-            $deleteIds = array_merge($deleteIds, $this->descendantIds($categoryId));
-        }
-
-        ProductCategory::whereIn('id', array_values(array_unique($deleteIds)))->delete();
-
-        return ApiResponse::success([], '删除成功');
+            return $deleteIds;
+        });
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Http\Resources\PermissionResource;
 use App\Http\Responses\ApiResponse;
 use App\Traits\ModelDeleteTrait;
 use App\Traits\TreeTrait;
+use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
 
 class PermissionController extends Controller
@@ -56,12 +57,13 @@ class PermissionController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        if (!$id) {
-            return ApiResponse::error("参数错误");
-        }
-        $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
+        $validated = $request->validate([
+            'ids' => ['required', 'string'],
+        ]);
+
+        $ids = $this->parseIds($validated['ids']);
         if ($ids === []) {
             return ApiResponse::error('参数错误');
         }

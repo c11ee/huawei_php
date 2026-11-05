@@ -106,12 +106,13 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        if (!$id) {
-            return ApiResponse::error("参数错误");
-        }
-        $ids = array_values(array_filter(explode(',', $id), fn($v) => $v !== ''));
+        $validated = $request->validate([
+            'ids' => ['required', 'string'],
+        ]);
+
+        $ids = $this->parseIds($validated['ids']);
         if ($ids === []) {
             return ApiResponse::error('参数错误');
         }

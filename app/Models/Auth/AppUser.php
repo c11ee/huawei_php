@@ -3,6 +3,7 @@
 namespace App\Models\Auth;
 
 use App\Models\Address\AppAddress;
+use App\Models\Cart\AppCartItem;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -27,5 +28,13 @@ class AppUser extends Authenticatable
     public function addresses()
     {
         return $this->hasMany(AppAddress::class, 'user_id', 'id')->orderBy('is_default', 'desc');
+    }
+
+    /**
+     * 所有的购物车信息
+     */
+    public function cartItems()
+    {
+        return $this->hasMany(AppCartItem::class, 'user_id', 'id');
     }
 }

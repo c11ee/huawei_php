@@ -35,7 +35,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [PermissionController::class, 'index'])->name('permissions.index')->middleware('can:permissions.index');
                 Route::post('/', [PermissionController::class, 'store'])->name('permissions.store')->middleware('can:permissions.store');
                 Route::put('/{id}', [PermissionController::class, 'update'])->name('permissions.update')->middleware('can:permissions.update');
-                Route::delete('/{id}', [PermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permissions.destroy');
+                Route::delete('/', [PermissionController::class, 'destroy'])->name('permissions.destroy')->middleware('can:permissions.destroy');
             });
 
             // 角色管理
@@ -43,7 +43,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [RoleController::class, 'index'])->name('role.index')->middleware('can:role.index');
                 Route::post('/', [RoleController::class, 'store'])->name('role.store')->middleware('can:role.store');
                 Route::put('/{id}', [RoleController::class, 'update'])->name('role.update')->middleware('can:role.update');
-                Route::delete('/{id}', [RoleController::class, 'destroy'])->name('role.destroy')->middleware('can:role.destroy');
+                Route::delete('/', [RoleController::class, 'destroy'])->name('role.destroy')->middleware('can:role.destroy');
                 Route::put('/{id}/status', [RoleController::class, 'updateStatus'])->name('role.updateStatus')->middleware('can:role.updateStatus');
             });
 
@@ -54,7 +54,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [UserController::class, 'index'])->name('user.index')->middleware('can:user.index');
                 Route::post('/', [UserController::class, 'store'])->name('user.store')->middleware('can:user.store');
                 Route::put('/{id}', [UserController::class, 'update'])->name('user.update')->middleware('can:user.update');
-                Route::delete('/{id}', [UserController::class, 'destroy'])->name('user.destroy')->middleware('can:user.destroy');
+                Route::delete('/', [UserController::class, 'destroy'])->name('user.destroy')->middleware('can:user.destroy');
                 Route::get('/{id}', [UserController::class, 'show'])->name('user.show')->middleware('can:user.show');
                 Route::put('/{id}/status', [UserController::class, 'updateStatus'])->name('user.updateStatus')->middleware('can:user.updateStatus');
             });
@@ -63,7 +63,7 @@ Route::prefix('admin')->group(function () {
             Route::prefix('folder')->group(function () {
                 Route::get('/tree', [FolderController::class, 'tree'])->name('folder.tree')->middleware('can:folder.tree');
                 Route::post('/', [FolderController::class, 'store'])->name('folder.store')->middleware('can:folder.store');
-                Route::delete('/{id}', [FolderController::class, 'destroy'])->name('folder.destroy')->middleware('can:folder.destroy');
+                Route::delete('/', [FolderController::class, 'destroy'])->name('folder.destroy')->middleware('can:folder.destroy');
             });
 
             // 附件管理
@@ -79,7 +79,7 @@ Route::prefix('admin')->group(function () {
                 Route::get('/', [CategoryController::class, 'index'])->name('category.index')->middleware('can:category.index');
                 Route::post('/', [CategoryController::class, 'store'])->name('category.store')->middleware('can:category.store');
                 Route::put('/{id}', [CategoryController::class, 'update'])->name('category.update')->middleware('can:category.update');
-                Route::delete('/{id}', [CategoryController::class, 'destroy'])->name('category.destroy')->middleware('can:category.destroy');
+                Route::delete('/', [CategoryController::class, 'destroy'])->name('category.destroy')->middleware('can:category.destroy');
             });
 
             // 品牌管理
@@ -88,7 +88,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', [BrandController::class, 'store'])->name('brand.store')->middleware('can:brand.store');
                 Route::put('/status', [BrandController::class, 'updateStatus'])->name('brand.updateStatus')->middleware('can:brand.updateStatus');
                 Route::put('/{id}', [BrandController::class, 'update'])->name('brand.update')->middleware('can:brand.update');
-                Route::delete('/{id}', [BrandController::class, 'destroy'])->name('brand.destroy')->middleware('can:brand.destroy');
+                Route::delete('/', [BrandController::class, 'destroy'])->name('brand.destroy')->middleware('can:brand.destroy');
             });
 
             // 规格模板管理
@@ -97,7 +97,7 @@ Route::prefix('admin')->group(function () {
                 Route::post('/', [ProductSpecTemplateController::class, 'store'])->name('spec-template.store')->middleware('can:spec-template.store');
                 Route::put('/status', [ProductSpecTemplateController::class, 'updateStatus'])->name('spec-template.updateStatus')->middleware('can:spec-template.updateStatus');
                 Route::put('/{id}', [ProductSpecTemplateController::class, 'update'])->name('spec-template.update')->middleware('can:spec-template.update');
-                Route::delete('/{id}', [ProductSpecTemplateController::class, 'destroy'])->name('spec-template.destroy')->middleware('can:spec-template.destroy');
+                Route::delete('/', [ProductSpecTemplateController::class, 'destroy'])->name('spec-template.destroy')->middleware('can:spec-template.destroy');
             });
 
             // 产品管理
@@ -108,7 +108,7 @@ Route::prefix('admin')->group(function () {
                 Route::put('/restore', [ProductController::class, 'restore'])->name('product.restore')->middleware('can:product.restore');
                 Route::put('/update-category', [ProductController::class, 'updateCategory'])->name('product.updateCategory')->middleware('can:product.updateCategory');
                 Route::put('/{id}', [ProductController::class, 'update'])->name('product.update')->middleware('can:product.update');
-                Route::delete('/{id}', [ProductController::class, 'destroy'])->name('product.destroy')->middleware('can:product.destroy');
+                Route::delete('/', [ProductController::class, 'destroy'])->name('product.destroy')->middleware('can:product.destroy');
                 Route::get('/{id}', [ProductController::class, 'show'])->name('product.show')->middleware('can:product.show');
             });
         });

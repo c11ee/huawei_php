@@ -12,7 +12,6 @@ class ProductSku extends BaseModel
     protected $guarded = [];
 
     protected $casts = [
-        'spec_json' => 'array',
         'sale_price' => 'decimal:2',
         'cost_price' => 'decimal:2',
         'strike_price' => 'decimal:2',
@@ -51,18 +50,30 @@ class ProductSku extends BaseModel
     }
 
     /**
-     * 规格映射: {规格ID: 规格值ID}
+     * 规格列表: 合并规格 ID 与文本, 形如
+     * [['spec_id' => 16, 'spec_name' => '颜色', 'spec_value_id' => 45, 'spec_value' => '雪域白']]
      */
-    public function getSpecValueMapAttribute(): array
+    public function getSkuSpecsAttribute(): array
     {
-        // 已预加载时直接用，避免触发懒加载把 spec_values 带进输出；否则单独查询
         $specValues = $this->relationLoaded('specValues')
             ? $this->specValues
-            : $this->specValues()->get();
+            : $this->specValues()->with('spec')->get();
 
-        return $specValues->mapWithKeys(
-            fn($item) => [$item->pivot->spec_id => $item->id]
-        )->all();
+        // 已预加载 specValues 但未带 spec 关联时, 重新查询一次, 避免逐条懒加载
+        if ($specValues->isNotEmpty() && !$specValues->first()->relationLoaded('spec')) {
+            $specValues = $this->specValues()->with('spec')->get();
+        }
+
+        return $specValues
+            ->sortBy(fn($item) => $item->spec?->sort ?? 0)
+            ->map(fn($item) => [
+                'spec_id'       => $item->pivot->spec_id,
+                'spec_name'     => $item->spec?->name ?? '',
+                'spec_value_id' => $item->id,
+                'spec_value'    => $item->value,
+            ])
+            ->values()
+            ->all();
     }
 
     /**
@@ -70,6 +81,6 @@ class ProductSku extends BaseModel
      */
     protected function getArrayableAppends()
     {
-        return array_merge(parent::getArrayableAppends(), ['spec_value_map']);
+        return array_merge(parent::getArrayableAppends(), ['sku_specs']);
     }
 }

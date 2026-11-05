@@ -18,7 +18,6 @@ return new class extends Migration
             $table->string('name', 64)->comment('SKU名称');
             $table->tinyInteger('is_default')->default(0)->comment('是否默认');
             $table->char('spec_hash', 64)->comment('规格组合 SHA-256 防重复');
-            $table->json('spec_json')->nullable()->comment('规格快照');
             $table->string('image_url', 255)->comment('SKU主图');
             $table->decimal('sale_price', 12, 2)->default(0.00)->comment('销售价格');
             $table->decimal('cost_price', 12, 2)->default(0.00)->comment('成本价格');

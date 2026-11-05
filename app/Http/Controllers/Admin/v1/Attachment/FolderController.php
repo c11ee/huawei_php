@@ -54,9 +54,13 @@ class FolderController extends Controller
      * 接收文件夹id(支持逗号分隔批量删除)
      * 使用 recycle 字段判断是否删除还是移到回收站
      */
-    public function destroy(Request $request, string $id)
+    public function destroy(Request $request)
     {
-        $ids = $this->parseIds($id);
+        $validated = $request->validate([
+            'ids' => ['required', 'string'],
+        ]);
+
+        $ids = $this->parseIds($validated['ids']);
         if ($ids === []) {
             return ApiResponse::error('参数错误');
         }

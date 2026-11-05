@@ -17,7 +17,8 @@ class ProductService
      */
     public function getProductDetail(string $id): ?ProductSpu
     {
-        return ProductSpu::with('brand', 'creator', 'detail', 'updater', 'categories', 'specs', 'skus')->find($id);
+        // skus.specValues.spec 预加载规格链, 避免序列化时 sku_specs 追加属性逐 SKU 懒加载
+        return ProductSpu::with('brand', 'creator', 'detail', 'updater', 'categories', 'specs', 'skus.specValues.spec')->find($id);
     }
 
     /**
@@ -202,7 +203,6 @@ class ProductService
                         'name'         => $skuItem['name'],
                         'is_default'   => $skuItem['is_default'] ?? 0,
                         'spec_hash'    => $specHash,
-                        'spec_json'    => $skuItem['spec_values'],                    // 存入 JSON 快照
                         'image_url'    => $skuItem['image_url'] ?? '',
                         'sale_price'   => $skuItem['sale_price'] ?? 0,
                         'cost_price'   => $skuItem['cost_price'] ?? 0,
@@ -273,7 +273,7 @@ class ProductService
                 'default_sku_image_url'  => $defaultSkuImage,
             ]);
 
-            return $spu->load(['skus.specValues', 'categories', 'detail', 'specs.values']);
+            return $spu->load(['skus.specValues.spec', 'categories', 'detail', 'specs.values']);
         });
     }
 

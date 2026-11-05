@@ -5,12 +5,12 @@ namespace App\Http\Controllers\Admin\v1\Product;
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
 use App\Models\Product\ProductBrand;
-use App\Traits\BatchUpdateStatusTrait;
+use App\Traits\BatchOperationTrait;
 use Illuminate\Http\Request;
 
 class BrandController extends Controller
 {
-    use BatchUpdateStatusTrait;
+    use BatchOperationTrait;
 
     /**
      * Display a listing of the resource.
@@ -49,20 +49,9 @@ class BrandController extends Controller
     /**
      * 删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）
      */
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $id)),
-            fn($v) => $v > 0
-        ));
-
-        if ($ids === []) {
-            return ApiResponse::error('参数错误');
-        }
-
-        ProductBrand::whereIn('id', array_values(array_unique($ids)))->delete();
-
-        return ApiResponse::success([], '删除成功');
+        return $this->batchDelete($request, ProductBrand::class);
     }
 
     /**

@@ -13,14 +13,14 @@ use App\Models\Product\ProductSpecValue;
 use App\Models\Product\ProductSpu;
 use App\Models\Product\ProductSpuCategory;
 use App\Services\ProductService;
-use App\Traits\BatchUpdateStatusTrait;
+use App\Traits\BatchOperationTrait;
 use App\Traits\OperatorResourceTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
-    use OperatorResourceTrait, BatchUpdateStatusTrait;
+    use OperatorResourceTrait, BatchOperationTrait;
 
     protected ProductService $productService;
 
@@ -114,15 +114,16 @@ class ProductController extends Controller
     /**
      * 删除商品
      */
-    public function destroy(string $ids, Request $request)
+    public function destroy(Request $request)
     {
+        $validated = $request->validate([
+            'ids' => ['required', 'string'],
+        ]);
+
         // 彻底删除
         $forceDelete = $request->input('force_delete', 0);
 
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $ids)),
-            fn($v) => $v > 0
-        ));
+        $ids = $this->parseIds($validated['ids']);
 
         if ($ids === []) {
             return ApiResponse::error('参数错误');
@@ -161,10 +162,7 @@ class ProductController extends Controller
         ], [
             'ids.required' => 'ID不能为空',
         ]);
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $request->input('ids'))),
-            fn($v) => $v > 0
-        ));
+        $ids = $this->parseIds($request->input('ids'));
 
         if ($ids === []) {
             return ApiResponse::error('参数错误');

@@ -58,6 +58,9 @@
             "name": "认证"
         },
         {
+            "name": "购物车"
+        },
+        {
             "name": "测试"
         }
     ],
@@ -412,6 +415,72 @@
                     }
                 },
                 "x-apifox-folder": "后台/权限管理"
+            },
+            "delete": {
+                "tags": [
+                    "权限管理"
+                ],
+                "summary": "删除权限",
+                "operationId": "permissions.destroy",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 permissions.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：permissions.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/权限管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/permissions/{id}": {
@@ -547,61 +616,6 @@
                         }
                     }
                 },
-                "x-apifox-folder": "后台/权限管理"
-            },
-            "delete": {
-                "tags": [
-                    "权限管理"
-                ],
-                "summary": "删除权限",
-                "operationId": "permissions.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 permissions.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：permissions.destroy",
                 "x-apifox-folder": "后台/权限管理"
             }
         },
@@ -795,6 +809,72 @@
                     }
                 },
                 "x-apifox-folder": "后台/角色管理"
+            },
+            "delete": {
+                "tags": [
+                    "角色管理"
+                ],
+                "summary": "删除角色",
+                "operationId": "role.destroy",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 role.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：role.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/角色管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/role/{id}": {
@@ -894,61 +974,6 @@
                         }
                     }
                 },
-                "x-apifox-folder": "后台/角色管理"
-            },
-            "delete": {
-                "tags": [
-                    "角色管理"
-                ],
-                "summary": "删除角色",
-                "operationId": "role.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 role.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：role.destroy",
                 "x-apifox-folder": "后台/角色管理"
             }
         },
@@ -1322,6 +1347,72 @@
                     }
                 },
                 "x-apifox-folder": "后台/用户管理"
+            },
+            "delete": {
+                "tags": [
+                    "用户管理"
+                ],
+                "summary": "删除用户",
+                "operationId": "user.destroy",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 user.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：user.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/用户管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/user/{id}": {
@@ -1455,61 +1546,6 @@
                         }
                     }
                 },
-                "x-apifox-folder": "后台/用户管理"
-            },
-            "delete": {
-                "tags": [
-                    "用户管理"
-                ],
-                "summary": "删除用户",
-                "operationId": "user.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 user.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：user.destroy",
                 "x-apifox-folder": "后台/用户管理"
             },
             "get": {
@@ -1796,9 +1832,7 @@
                     }
                 },
                 "x-apifox-folder": "后台/文件夹管理"
-            }
-        },
-        "/admin/v1/folder/{id}": {
+            },
             "delete": {
                 "tags": [
                     "文件夹管理"
@@ -1806,15 +1840,6 @@
                 "summary": "删除文件夹",
                 "operationId": "folder.destroy",
                 "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
                     {
                         "name": "recycle",
                         "in": "query",
@@ -1863,8 +1888,28 @@
                         }
                     }
                 },
-                "description": "接收文件夹id(支持逗号分隔批量删除)\n使用 recycle 字段判断是否删除还是移到回收站\n需要权限：folder.destroy",
-                "x-apifox-folder": "后台/文件夹管理"
+                "description": "接收文件夹id(支持逗号分隔批量删除)\n使用 recycle 字段判断是否删除还是移到回收站\n需要权限：folder.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/文件夹管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/attachment": {
@@ -2313,6 +2358,72 @@
                     }
                 },
                 "x-apifox-folder": "后台/分类管理"
+            },
+            "delete": {
+                "tags": [
+                    "分类管理"
+                ],
+                "summary": "删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）",
+                "operationId": "category.destroy",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 category.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：category.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/分类管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/category/{id}": {
@@ -2427,61 +2538,6 @@
                         }
                     }
                 },
-                "x-apifox-folder": "后台/分类管理"
-            },
-            "delete": {
-                "tags": [
-                    "分类管理"
-                ],
-                "summary": "删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）",
-                "operationId": "category.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 category.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：category.destroy",
                 "x-apifox-folder": "后台/分类管理"
             }
         },
@@ -2648,6 +2704,72 @@
                     }
                 },
                 "x-apifox-folder": "后台/品牌管理"
+            },
+            "delete": {
+                "tags": [
+                    "品牌管理"
+                ],
+                "summary": "删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）",
+                "operationId": "brand.destroy",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 brand.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：brand.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/品牌管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/brand/status": {
@@ -2835,61 +2957,6 @@
                         }
                     }
                 },
-                "x-apifox-folder": "后台/品牌管理"
-            },
-            "delete": {
-                "tags": [
-                    "品牌管理"
-                ],
-                "summary": "删除分类（支持逗号分隔批量删除，连同子孙分类一并删除）",
-                "operationId": "brand.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 brand.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：brand.destroy",
                 "x-apifox-folder": "后台/品牌管理"
             }
         },
@@ -3179,6 +3246,72 @@
                     }
                 },
                 "x-apifox-folder": "后台/商品规格"
+            },
+            "delete": {
+                "tags": [
+                    "商品规格"
+                ],
+                "summary": "删除规格模板（支持逗号分隔批量删除，连同子孙规格模板一并删除）",
+                "operationId": "spec-template.destroy",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 spec-template.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：spec-template.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/商品规格",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/spec-template/status": {
@@ -3369,61 +3502,6 @@
                     }
                 },
                 "x-apifox-folder": "后台/商品规格"
-            },
-            "delete": {
-                "tags": [
-                    "商品规格"
-                ],
-                "summary": "删除规格模板（支持逗号分隔批量删除，连同子孙规格模板一并删除）",
-                "operationId": "spec-template.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 spec-template.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：spec-template.destroy",
-                "x-apifox-folder": "后台/商品规格"
             }
         },
         "/admin/v1/product": {
@@ -3522,6 +3600,112 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "data": [
+                                            {
+                                                "id": 2,
+                                                "spu_code": "HW-MATE-X6",
+                                                "product_name": "HUAWEI Mate X6",
+                                                "product_short_name": "Mate X6",
+                                                "product_description": "分布式玄武架构，鸿蒙大屏 AI，红枫原色影像",
+                                                "brand_id": 1,
+                                                "slider_images": [
+                                                    "https://cdn.example.com/images/x6-1.png",
+                                                    "https://cdn.example.com/images/x6-2.png"
+                                                ],
+                                                "video_url": "",
+                                                "video_cover_url": "",
+                                                "spec_template_id": 1,
+                                                "default_sku_id": 25,
+                                                "default_sku_sale_price": "5.00",
+                                                "default_sku_stock": 5,
+                                                "default_sku_image_url": "https://cdn.example.com/images/x6-default.png",
+                                                "min_sale_price": "5.00",
+                                                "max_sale_price": "5.00",
+                                                "total_stock": 100,
+                                                "total_sales": 0,
+                                                "status": 1,
+                                                "sort": 0,
+                                                "created_by": 7,
+                                                "updated_by": 7,
+                                                "deleted_at": null,
+                                                "created_at": "2026-09-22 11:39:54",
+                                                "updated_at": "2026-09-23 10:17:32",
+                                                "created_at_ts": 1790048394,
+                                                "updated_at_ts": 1790129852,
+                                                "brand": {
+                                                    "id": 1,
+                                                    "name": "华为",
+                                                    "logo": "https://cdn.example.com/brand/1.ico",
+                                                    "sort": 0,
+                                                    "status": 1,
+                                                    "created_at": "2026-09-22 11:35:18",
+                                                    "updated_at": "2026-09-22 11:35:18",
+                                                    "created_at_ts": 1790048118,
+                                                    "updated_at_ts": 1790048118
+                                                },
+                                                "creator": {
+                                                    "id": 7,
+                                                    "username": "admin",
+                                                    "nickname": "admin",
+                                                    "phone": "18888888888",
+                                                    "avatar": "https://cdn.example.com/avatar/7.jpg",
+                                                    "status": 1,
+                                                    "role_ids": "16",
+                                                    "role_names": "超级管理员",
+                                                    "created_at": "2026-06-13 11:29:38",
+                                                    "updated_at": "2026-09-15 17:17:11",
+                                                    "created_at_ts": 1781321378,
+                                                    "updated_at_ts": 1789463831
+                                                },
+                                                "updater": {
+                                                    "id": 7,
+                                                    "username": "admin",
+                                                    "nickname": "admin",
+                                                    "phone": "18888888888",
+                                                    "avatar": "https://cdn.example.com/avatar/7.jpg",
+                                                    "status": 1,
+                                                    "role_ids": "16",
+                                                    "role_names": "超级管理员",
+                                                    "created_at": "2026-06-13 11:29:38",
+                                                    "updated_at": "2026-09-15 17:17:11",
+                                                    "created_at_ts": 1781321378,
+                                                    "updated_at_ts": 1789463831
+                                                },
+                                                "categories": [
+                                                    {
+                                                        "id": 14,
+                                                        "category_name": "Mate 系列",
+                                                        "parent_id": 13,
+                                                        "icon": "",
+                                                        "status": 1,
+                                                        "is_home": 0,
+                                                        "sort": 2,
+                                                        "created_at": "2026-09-22 11:36:33",
+                                                        "updated_at": "2026-10-13 10:04:04",
+                                                        "created_at_ts": 1790048193,
+                                                        "updated_at_ts": 1791857044,
+                                                        "pivot": {
+                                                            "spu_id": 2,
+                                                            "category_id": 14
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "page": 1,
+                                        "total": 131,
+                                        "counts": {
+                                            "draft": 0,
+                                            "on_sale": 131,
+                                            "off_sale": 0,
+                                            "trashed": 0
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -3547,7 +3731,7 @@
                         }
                     }
                 },
-                "description": "需要权限：product.index",
+                "description": "需要权限：product.index。返回分页数据：data 为 SPU 列表（含 brand、creator、updater、categories），page 为当前页码，total 为总数，counts 为各状态商品数量（draft/on_sale/off_sale/trashed）。",
                 "x-apifox-folder": "后台/商品管理"
             },
             "post": {
@@ -4115,6 +4299,84 @@
                     }
                 },
                 "x-apifox-folder": "后台/商品管理"
+            },
+            "delete": {
+                "tags": [
+                    "商品管理"
+                ],
+                "summary": "删除商品",
+                "operationId": "product.destroy",
+                "parameters": [
+                    {
+                        "name": "force_delete",
+                        "in": "query",
+                        "required": false,
+                        "description": "是否彻底删除（1 是，0 否）",
+                        "schema": {
+                            "type": "integer",
+                            "example": 0
+                        },
+                        "style": "form",
+                        "explode": true
+                    },
+                    {
+                        "$ref": "#/components/parameters/AdminAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "无权限（需要 product.destroy）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "description": "需要权限：product.destroy\n支持逗号分隔批量删除，ID 通过请求体 ids 传入。",
+                "x-apifox-folder": "后台/商品管理",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "要操作的 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
         },
         "/admin/v1/product/status": {
@@ -4714,73 +4976,6 @@
                 },
                 "x-apifox-folder": "后台/商品管理"
             },
-            "delete": {
-                "tags": [
-                    "商品管理"
-                ],
-                "summary": "删除商品",
-                "operationId": "product.destroy",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "path",
-                        "required": true,
-                        "description": "资源 ID，多个 ID 可用英文逗号分隔",
-                        "schema": {
-                            "type": "integer"
-                        }
-                    },
-                    {
-                        "name": "force_delete",
-                        "in": "query",
-                        "required": false,
-                        "description": "是否彻底删除（1 是，0 否）",
-                        "schema": {
-                            "type": "integer",
-                            "example": 0
-                        },
-                        "style": "form",
-                        "explode": true
-                    },
-                    {
-                        "$ref": "#/components/parameters/AdminAuthorization"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "成功",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "未登录或 Token 失效",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "无权限（需要 product.destroy）",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/ApiResponse"
-                                }
-                            }
-                        }
-                    }
-                },
-                "description": "需要权限：product.destroy",
-                "x-apifox-folder": "后台/商品管理"
-            },
             "get": {
                 "tags": [
                     "商品管理"
@@ -4808,6 +5003,212 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "id": 10,
+                                        "spu_code": "10086476013098",
+                                        "product_name": "HUAWEI Mate 80 Pro",
+                                        "product_short_name": "Mate 80 Pro",
+                                        "product_description": "第二代红枫影像，鸿蒙 AI，户外探索模式",
+                                        "brand_id": 1,
+                                        "slider_images": [
+                                            "https://cdn.example.com/images/m80-1.png",
+                                            "https://cdn.example.com/images/m80-2.png"
+                                        ],
+                                        "video_url": "",
+                                        "video_cover_url": "",
+                                        "spec_template_id": 0,
+                                        "default_sku_id": 112,
+                                        "default_sku_sale_price": "6999.00",
+                                        "default_sku_stock": 0,
+                                        "default_sku_image_url": "https://cdn.example.com/images/m80-default.png",
+                                        "min_sale_price": "6999.00",
+                                        "max_sale_price": "8999.00",
+                                        "total_stock": 100,
+                                        "total_sales": 0,
+                                        "status": 1,
+                                        "sort": 1,
+                                        "created_by": 7,
+                                        "updated_by": 7,
+                                        "deleted_at": null,
+                                        "created_at": "2026-09-23 11:57:34",
+                                        "updated_at": "2026-10-12 11:50:51",
+                                        "created_at_ts": 1790135854,
+                                        "updated_at_ts": 1791777051,
+                                        "brand": {
+                                            "id": 1,
+                                            "name": "华为",
+                                            "logo": "https://cdn.example.com/brand/1.ico",
+                                            "sort": 0,
+                                            "status": 1,
+                                            "created_at": "2026-09-22 11:35:18",
+                                            "updated_at": "2026-09-22 11:35:18",
+                                            "created_at_ts": 1790048118,
+                                            "updated_at_ts": 1790048118
+                                        },
+                                        "creator": {
+                                            "id": 7,
+                                            "name": "admin",
+                                            "username": "admin",
+                                            "phone": "18888888888",
+                                            "email": "",
+                                            "status": 1,
+                                            "role_ids": "16",
+                                            "avatar": "https://cdn.example.com/avatar/7.jpg",
+                                            "created_at": "2026-06-13T03:29:38.000000Z",
+                                            "updated_at": "2026-09-15T09:17:11.000000Z"
+                                        },
+                                        "detail": {
+                                            "id": 10,
+                                            "owner_type": "spu",
+                                            "owner_id": 10,
+                                            "detail_html": "<div class=\"richTextContent\"><p>商品详情富文本 HTML</p></div>",
+                                            "mobile_detail_html": "<div class=\"richTextContent\"><p>移动端详情富文本 HTML</p></div>",
+                                            "created_at": "2026-09-23 11:57:34",
+                                            "updated_at": "2026-09-23 11:57:34",
+                                            "created_at_ts": 1790135854,
+                                            "updated_at_ts": 1790135854
+                                        },
+                                        "updater": {
+                                            "id": 7,
+                                            "name": "admin",
+                                            "username": "admin",
+                                            "phone": "18888888888",
+                                            "email": "",
+                                            "status": 1,
+                                            "role_ids": "16",
+                                            "avatar": "https://cdn.example.com/avatar/7.jpg",
+                                            "created_at": "2026-06-13T03:29:38.000000Z",
+                                            "updated_at": "2026-09-15T09:17:11.000000Z"
+                                        },
+                                        "categories": [
+                                            {
+                                                "id": 14,
+                                                "category_name": "Mate 系列",
+                                                "parent_id": 13,
+                                                "icon": "",
+                                                "status": 1,
+                                                "is_home": 0,
+                                                "sort": 2,
+                                                "created_at": "2026-09-22 11:36:33",
+                                                "updated_at": "2026-10-13 10:04:04",
+                                                "created_at_ts": 1790048193,
+                                                "updated_at_ts": 1791857044,
+                                                "pivot": {
+                                                    "spu_id": 10,
+                                                    "category_id": 14
+                                                }
+                                            }
+                                        ],
+                                        "specs": [
+                                            {
+                                                "id": 22,
+                                                "spu_id": 10,
+                                                "name": "颜色",
+                                                "is_image_required": 1,
+                                                "sort": 1,
+                                                "created_at": "2026-09-23 11:57:34",
+                                                "updated_at": "2026-10-19 17:33:48",
+                                                "created_at_ts": 1790135854,
+                                                "updated_at_ts": 1792402428,
+                                                "values": [
+                                                    {
+                                                        "id": 63,
+                                                        "spu_id": 10,
+                                                        "spec_id": 22,
+                                                        "value": "晨曦金",
+                                                        "image_url": "https://cdn.example.com/spec/63.png",
+                                                        "sort": 1,
+                                                        "created_at": "2026-09-23 11:57:34",
+                                                        "updated_at": "2026-10-19 17:33:48",
+                                                        "created_at_ts": 1790135854,
+                                                        "updated_at_ts": 1792402428
+                                                    },
+                                                    {
+                                                        "id": 64,
+                                                        "spu_id": 10,
+                                                        "spec_id": 22,
+                                                        "value": "曜石黑",
+                                                        "image_url": "",
+                                                        "sort": 2,
+                                                        "created_at": "2026-09-23 11:57:34",
+                                                        "updated_at": "2026-09-23 11:57:34",
+                                                        "created_at_ts": 1790135854,
+                                                        "updated_at_ts": 1790135854
+                                                    }
+                                                ]
+                                            }
+                                        ],
+                                        "skus": [
+                                            {
+                                                "id": 112,
+                                                "spu_id": 10,
+                                                "sku_code": "2601010586419",
+                                                "name": "HUAWEI Mate 80 Pro 12GB+256GB 晨曦金",
+                                                "is_default": 1,
+                                                "spec_hash": "b431c7bc1d581cd1962de1a73fe6b2748a1305c4ddd5fee50453df15d98390e4",
+                                                "image_url": "https://cdn.example.com/images/m80-default.png",
+                                                "sale_price": "6999.00",
+                                                "cost_price": "0.00",
+                                                "strike_price": "7999.00",
+                                                "stock": 100,
+                                                "locked_stock": 0,
+                                                "sales": 0,
+                                                "weight": "3.000",
+                                                "volume": "2.0000",
+                                                "status": 1,
+                                                "sort": 1,
+                                                "created_by": 0,
+                                                "updated_by": 7,
+                                                "created_at": "2026-09-23 11:57:34",
+                                                "updated_at": "2026-10-19 10:32:20",
+                                                "created_at_ts": 1790135854,
+                                                "updated_at_ts": 1792377140,
+                                                "sku_specs": [
+                                                    {
+                                                        "spec_id": 22,
+                                                        "spec_name": "颜色",
+                                                        "spec_value_id": 63,
+                                                        "spec_value": "晨曦金"
+                                                    }
+                                                ],
+                                                "spec_values": [
+                                                    {
+                                                        "id": 63,
+                                                        "spu_id": 10,
+                                                        "spec_id": 22,
+                                                        "value": "晨曦金",
+                                                        "image_url": "https://cdn.example.com/spec/63.png",
+                                                        "sort": 1,
+                                                        "created_at": "2026-09-23 11:57:34",
+                                                        "updated_at": "2026-10-19 17:33:48",
+                                                        "created_at_ts": 1790135854,
+                                                        "updated_at_ts": 1792402428,
+                                                        "pivot": {
+                                                            "sku_id": 112,
+                                                            "spec_value_id": 63,
+                                                            "spu_id": 10,
+                                                            "spec_id": 22
+                                                        },
+                                                        "spec": {
+                                                            "id": 22,
+                                                            "spu_id": 10,
+                                                            "name": "颜色",
+                                                            "is_image_required": 1,
+                                                            "sort": 1,
+                                                            "created_at": "2026-09-23 11:57:34",
+                                                            "updated_at": "2026-10-19 17:33:48",
+                                                            "created_at_ts": 1790135854,
+                                                            "updated_at_ts": 1792402428
+                                                        }
+                                                    }
+                                                ]
+                                            }
+                                        ]
+                                    }
                                 }
                             }
                         }
@@ -4833,7 +5234,7 @@
                         }
                     }
                 },
-                "description": "需要权限：product.show",
+                "description": "需要权限：product.show。返回 SPU 详情及关联数据：brand 品牌、creator/updater 操作人、detail 详情富文本、categories 分类、specs 规格树（含 values）、skus SKU 列表。每个 SKU 含 sku_specs 规格列表（[{spec_id, spec_name, spec_value_id, spec_value}]）与 spec_values 规格值关联（含 spec 规格项）；spec_json 字段已移除。",
                 "x-apifox-folder": "后台/商品管理"
             }
         },
@@ -5198,16 +5599,16 @@
                                     "code": 200,
                                     "msg": "ok",
                                     "data": {
-                                            "country": "中国",
-                                            "province": "上海",
-                                            "province_id": 9,
-                                            "city": "上海",
-                                            "city_id": 108,
-                                            "district": "黄浦",
-                                            "district_id": 1130,
-                                            "township": "南京东路",
-                                            "township_id": 12430,
-                                            "address": "上海市黄浦区南京东路街道上海市人民政府"
+                                        "country": "中国",
+                                        "province": "上海",
+                                        "province_id": 9,
+                                        "city": "上海",
+                                        "city_id": 108,
+                                        "district": "黄浦",
+                                        "district_id": 1130,
+                                        "township": "南京东路",
+                                        "township_id": 12430,
+                                        "address": "上海市黄浦区南京东路街道上海市人民政府"
                                     }
                                 }
                             }
@@ -5470,19 +5871,19 @@
                                     "code": 200,
                                     "msg": "ok",
                                     "data": {
-                                            "house_info": "45栋",
-                                            "poi_info": "宝湖新村",
-                                            "town": "龙华街道",
-                                            "city": "深圳市",
-                                            "district": "龙华区",
-                                            "tel": "13800138000",
-                                            "addr_info": "宝湖新村45栋",
-                                            "per": "张先生",
-                                            "prov": "广东省",
-                                            "prov_id": 19,
-                                            "city_id": 236,
-                                            "district_id": 2164,
-                                            "town_id": 27314
+                                        "house_info": "45栋",
+                                        "poi_info": "宝湖新村",
+                                        "town": "龙华街道",
+                                        "city": "深圳市",
+                                        "district": "龙华区",
+                                        "tel": "13800138000",
+                                        "addr_info": "宝湖新村45栋",
+                                        "per": "张先生",
+                                        "prov": "广东省",
+                                        "prov_id": 19,
+                                        "city_id": 236,
+                                        "district_id": 2164,
+                                        "town_id": 27314
                                     }
                                 }
                             }
@@ -6336,6 +6737,258 @@
                 "x-apifox-folder": "前台/认证"
             }
         },
+        "/api/v1/cart": {
+            "get": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "购物车列表",
+                "description": "按品牌分组返回当前登录用户的购物车项，items 按加入时间倒序。分组节点包含 brand_id、brand_name、brand_logo、item_count 与 items；每个购物车项包含 id、sku_id、quantity、is_checked 等字段，以及 product 商品展示信息（spu_id、spu_name、sku_name、image_url、sale_price、stock、sku_specs、brand_id、brand_name、brand_logo、offline_reason）。sku_specs 为该 SKU 的规格列表，形如 [{spec_id, spec_name, spec_value_id, spec_value}]。商品未被删除时 product 取实时数据，offline_reason 为空字符串；商品被删除（含软删）时 product 回退到加购时的快照，offline_reason=deleted；商品下架时 offline_reason=offline；库存为 0 时 offline_reason=out_of_stock。sku 与 snapshot_json 不返回。",
+                "operationId": "get.api.v1.cart",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": [
+                                        {
+                                            "brand_id": 1,
+                                            "brand_name": "华为",
+                                            "brand_logo": "https://cdn.example.com/brand/1.png",
+                                            "item_count": 2,
+                                            "items": [
+                                                {
+                                                    "id": 1,
+                                                    "user_id": 1,
+                                                    "sku_id": 10,
+                                                    "quantity": 2,
+                                                    "is_checked": 1,
+                                                    "created_at": "2026-10-30 10:00:00",
+                                                    "updated_at": "2026-10-30 10:05:00",
+                                                    "created_at_ts": 1761789600,
+                                                    "updated_at_ts": 1761789900,
+                                                    "product": {
+                                                        "spu_id": 3,
+                                                        "spu_name": "HUAWEI Mate 70",
+                                                        "sku_name": "HUAWEI Mate 70 曜石黑 256G",
+                                                        "image_url": "https://cdn.example.com/sku/10.jpg",
+                                                        "sale_price": "1299.00",
+                                                        "stock": 100,
+                                                        "sku_specs": [
+                                                            {
+                                                                "spec_id": 1,
+                                                                "spec_name": "颜色",
+                                                                "spec_value_id": 2,
+                                                                "spec_value": "曜石黑"
+                                                            },
+                                                            {
+                                                                "spec_id": 2,
+                                                                "spec_name": "存储",
+                                                                "spec_value_id": 5,
+                                                                "spec_value": "256G"
+                                                            }
+                                                        ],
+                                                        "brand_id": 1,
+                                                        "brand_name": "华为",
+                                                        "brand_logo": "https://cdn.example.com/brand/1.png",
+                                                        "offline_reason": ""
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
+            },
+            "post": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "添加购物车",
+                "description": "同一用户同一 SKU 只保留一条记录，已存在时累加数量（quantity = quantity + num）。校验顺序：SKU 未启用、或所属 SPU 已下架/已删除 → HTTP 200、code=0、msg=商品已下架；可用库存（stock - locked_stock）不足（含购物车中已有数量）→ HTTP 200、code=0、msg=库存不足。加购时写入商品快照，用于商品后续被删除后的展示兜底。",
+                "operationId": "post.api.v1.cart",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "sku_id": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "SKU ID（product_sku.id），必须存在",
+                                        "example": 10
+                                    },
+                                    "num": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "添加数量，SKU 已在该用户购物车中时累加",
+                                        "example": 1
+                                    }
+                                },
+                                "required": [
+                                    "sku_id",
+                                    "num"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功（商品已下架时 data 为空、code=0）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "examples": {
+                                    "success": {
+                                        "summary": "添加成功",
+                                        "value": {
+                                            "code": 200,
+                                            "msg": "ok",
+                                            "data": []
+                                        }
+                                    },
+                                    "offline": {
+                                        "summary": "商品已下架",
+                                        "value": {
+                                            "code": 0,
+                                            "msg": "商品已下架",
+                                            "data": []
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（sku_id 不存在或 num 小于 1）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
+            },
+            "delete": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "删除购物车项",
+                "description": "按 ids 批量删除当前登录用户的购物车项（物理删除，不可恢复）。只删除属于当前用户的记录，不存在或不属于本人的 id 会被忽略。",
+                "operationId": "delete.api.v1.cart",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "购物车项 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "删除成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（ids 缺失或为空）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
+            }
+        },
         "/api/v1/test": {
             "get": {
                 "tags": [
@@ -6357,6 +7010,172 @@
                     }
                 },
                 "x-apifox-folder": "前台/测试"
+            }
+        },
+        "/api/v1/cart/checked": {
+            "put": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "批量切换选中状态",
+                "operationId": "put.api.v1.cart.checked",
+                "description": "按 ids 批量更新当前用户购物车项的选中状态，只影响属于本人的记录。",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "ids",
+                                    "is_checked"
+                                ],
+                                "properties": {
+                                    "ids": {
+                                        "type": "string",
+                                        "description": "购物车项 ID，多个用英文逗号分隔",
+                                        "example": "1,2,3"
+                                    },
+                                    "is_checked": {
+                                        "type": "integer",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ],
+                                        "description": "1 选中，0 取消选中",
+                                        "example": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "更新成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（ids 缺失或 is_checked 非 0/1）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
+            }
+        },
+        "/api/v1/cart/quantity/{id}": {
+            "put": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "修改购物车商品数量",
+                "operationId": "put.api.v1.cart.quantity.id",
+                "description": "修改单个购物车项的数量，数量最小为 1，且不能超过可用库存（stock - locked_stock）。",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "description": "购物车项 ID（app_cart_item.id）",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "quantity"
+                                ],
+                                "properties": {
+                                    "quantity": {
+                                        "type": "integer",
+                                        "minimum": 1,
+                                        "description": "修改后的数量",
+                                        "example": 2
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "修改成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "购物车项不存在或不属于当前用户",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（quantity 缺失或小于 1）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
             }
         }
     },

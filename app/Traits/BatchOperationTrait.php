@@ -6,7 +6,7 @@ use App\Http\Responses\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
-trait BatchUpdateStatusTrait
+trait BatchOperationTrait
 {
     /**
      * 批量更新状态 (ids 支持逗号分隔)
@@ -22,10 +22,7 @@ trait BatchUpdateStatusTrait
             'status.integer' => '状态必须为整数',
         ]);
 
-        $ids = array_values(array_filter(
-            array_map('intval', explode(',', $request->ids)),
-            fn($v) => $v > 0
-        ));
+        $ids = $this->parseIds($request->ids);
 
         if ($ids === []) {
             return ApiResponse::error('参数错误');
@@ -47,5 +44,33 @@ trait BatchUpdateStatusTrait
         }
 
         return ApiResponse::success([], '更新成功');
+    }
+
+    /**
+     * 批量删除 (ids 支持逗号分隔)
+     *
+     * @param  callable|null  $expandIds  扩展待删除 id 的回调, 用于级联子级等场景
+     */
+    protected function batchDelete(Request $request, string $model, ?callable $expandIds = null)
+    {
+        $request->validate([
+            'ids' => 'required|string',
+        ], [
+            'ids.required' => 'ID不能为空',
+        ]);
+
+        $ids = $this->parseIds($request->ids);
+
+        if ($ids === []) {
+            return ApiResponse::error('参数错误');
+        }
+
+        if ($expandIds !== null) {
+            $ids = array_values(array_unique($expandIds($ids)));
+        }
+
+        $model::whereIn('id', $ids)->delete();
+
+        return ApiResponse::success([], '删除成功');
     }
 }

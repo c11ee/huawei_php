@@ -20,7 +20,7 @@ class ProductController extends Controller
         $product = $this->productService->getProductDetail($spu_id);
 
         // 前台接口不返回 SKU 成本价
-        $product->skus->makeHidden('cost_price');
+        $product->makeHidden(['creator', 'updater', 'created_at', 'updated_at', 'created_at_ts', 'updated_at_ts'])->skus->makeHidden('cost_price');
 
         return ApiResponse::success($product);
     }

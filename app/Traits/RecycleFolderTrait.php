@@ -9,14 +9,6 @@ use Illuminate\Support\Facades\Storage;
 trait RecycleFolderTrait
 {
     /**
-     * 解析逗号分隔的 id 列表
-     */
-    protected function parseIds(?string $value): array
-    {
-        return array_values(array_filter(explode(',', (string) $value), fn($v) => $v !== ''));
-    }
-
-    /**
      * 获取文件夹及其所有子孙文件夹 id
      */
     protected function folderIdsWithDescendants(array $ids): array

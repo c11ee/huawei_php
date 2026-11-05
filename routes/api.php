@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\v1\Product\CategoryController;
 use App\Http\Controllers\Api\v1\Address\AddressController;
 use App\Http\Controllers\Api\v1\Auth\AuthController;
+use App\Http\Controllers\Api\v1\Cart\CartController;
 use App\Http\Controllers\Api\v1\Home\HomeController;
 use App\Http\Controllers\Api\v1\Product\ProductController;
 use App\Http\Controllers\Api\v1\Search\SearchController;
@@ -70,6 +71,14 @@ Route::prefix('api')->group(function () {
                 Route::put('/set-default/{id}', [AddressController::class, 'setDefault']);
                 Route::put('/{id}', [AddressController::class, 'update']);
                 Route::delete('/{id}', [AddressController::class, 'destroy']);
+            });
+
+            Route::prefix('cart')->group(function () {
+                Route::get('/', [CartController::class, 'index']);
+                Route::post('/', [CartController::class, 'store']);
+                Route::put('/checked', [CartController::class, 'updateChecked']);
+                Route::put('/quantity/{id}', [CartController::class, 'updateQuantity']);
+                Route::delete('/', [CartController::class, 'destroy']);
             });
         });
     });
