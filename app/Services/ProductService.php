@@ -8,6 +8,7 @@ use App\Models\Product\ProductSpec;
 use App\Models\Product\ProductSpecValue;
 use App\Models\Product\ProductSpu;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ProductService
@@ -27,8 +28,7 @@ class ProductService
     public function saveProduct(array $data, ?string $id = null): ProductSpu
     {
         return DB::transaction(function () use ($data, $id) {
-            // $userId = Auth::id() ?? 0;
-            $userId = 7;
+            $userId = Auth::id() ?? 0;
             $spuId  = $id ?? null;
             $isEdit = !empty($spuId);
 
@@ -90,53 +90,88 @@ class ProductService
             // ==========================================
             // 4. 处理 规格项 (Spec) 与 规格值 (SpecValue)
             // ==========================================
-            $specValueMap      = [];  // 存储映射关系：'颜色|星云灰' => ['spec_id' => X, 'spec_value_id' => Y]
-            $specValueImageMap = [];  // 存储规格值图片：spec_value_id => image_url
-            $submittedSpecIds  = [];  // 存储提交的规格项ID
-            $submittedValueIds = [];  // 存储提交的规格值ID
+            $specValueImageMap   = [];  // 真实规格值 ID => 规格值图片
+            $specValueSpecIdMap  = [];  // 真实规格值 ID => 规格项 ID
+            $specValueNameMap    = [];  // 真实规格值 ID => 规格值文本
+            $specValueUidMap     = [];  // 临时规格值 ID => 真实规格值 ID(仅本次请求内有效)
+            $submittedSpecIds    = [];  // 存储提交的规格项ID
+            $submittedValueIds   = [];  // 存储提交的规格值ID
+
+            // 本次提交中带真实 ID 的规格值, 新建查重时需排除, 避免把本次要更新的记录误判为重复
+            $realValueIdsInSubmission = [];
+            foreach ($data['specs'] ?? [] as $specItem) {
+                foreach ($specItem['values'] ?? [] as $valItem) {
+                    if ($this->isRealId($valItem['id'] ?? null)) {
+                        $realValueIdsInSubmission[] = (int) $valItem['id'];
+                    }
+                }
+            }
 
             if (!empty($data['specs'])) {
                 foreach ($data['specs'] as $specItem) {
-                    $specId = $specItem['id'] ?? null;
+                    $specId  = $specItem['id'] ?? null;
+                    $payload = [
+                        'spu_id'            => $spu->id,
+                        'name'              => $specItem['name'],
+                        'is_image_required' => $specItem['is_image_required'] ?? 0,
+                        'sort'              => $specItem['sort'] ?? 0,
+                    ];
 
-                    $spec = ProductSpec::updateOrCreate(
-                        ['id' => $specId, 'spu_id' => $spu->id],
-                        [
-                            'spu_id'            => $spu->id,
-                            'name'              => $specItem['name'],
-                            'is_image_required' => $specItem['is_image_required'] ?? 0,
-                            'sort'              => $specItem['sort'] ?? 0,
-                        ]
-                    );
+                    if ($this->isRealId($specId)) {
+                        // 编辑已存在的规格: 必须属于当前商品, 防止跨商品改动
+                        $spec = ProductSpec::where('id', (int) $specId)->where('spu_id', $spu->id)->first();
+                        if (!$spec) {
+                            throw new Exception("规格【{$specItem['name']}】不存在或不属于当前商品");
+                        }
+                        $spec->update($payload);
+                    } else {
+                        // 新增规格(临时 ID 或未传 ID)
+                        $spec = ProductSpec::create($payload);
+                    }
                     $submittedSpecIds[] = $spec->id;
 
-                    if (!empty($specItem['values'])) {
-                        foreach ($specItem['values'] as $valItem) {
-                            $valId = $valItem['id'] ?? null;
+                    foreach ($specItem['values'] ?? [] as $valItem) {
+                        $valId      = $valItem['id'] ?? null;
+                        $valPayload = [
+                            'spu_id'    => $spu->id,
+                            'spec_id'   => $spec->id,
+                            'value'     => $valItem['value'],
+                            'image_url' => $valItem['image_url'] ?? '',
+                            'sort'      => $valItem['sort'] ?? 0,
+                        ];
 
-                            $specValue = ProductSpecValue::updateOrCreate(
-                                ['id' => $valId, 'spu_id' => $spu->id],
-                                [
-                                    'spu_id'    => $spu->id,
-                                    'spec_id'   => $spec->id,
-                                    'value'     => $valItem['value'],
-                                    'image_url' => $valItem['image_url'] ?? '',
-                                    'sort'      => $valItem['sort'] ?? 0,
-                                ]
-                            );
-                            $submittedValueIds[] = $specValue->id;
-
-                            // 仅记录「需要图片」的规格项下的规格值图片，供 SKU 无图时兜底
-                            if (!empty($specItem['is_image_required'])) {
-                                $specValueImageMap[$specValue->id] = $valItem['image_url'] ?? '';
+                        if ($this->isRealId($valId)) {
+                            $specValue = ProductSpecValue::where('id', (int) $valId)->where('spu_id', $spu->id)->first();
+                            if (!$specValue) {
+                                throw new Exception("规格值【{$valItem['value']}】不存在或不属于当前商品");
+                            }
+                            $specValue->update($valPayload);
+                        } else {
+                            // 新建规格值前查重: 同一规格项下不允许出现重名值, 否则按 ID 绑定会产生歧义
+                            $duplicate = ProductSpecValue::where('spu_id', $spu->id)
+                                ->where('spec_id', $spec->id)
+                                ->where('value', $valItem['value'])
+                                ->whereNotIn('id', $realValueIdsInSubmission)
+                                ->exists();
+                            if ($duplicate) {
+                                throw new Exception("规格值【{$specItem['name']}: {$valItem['value']}】已存在，请勿重复添加");
                             }
 
-                            // 逻辑 Key 绑定
-                            $key = $specItem['name'] . '|' . $valItem['value'];
-                            $specValueMap[$key] = [
-                                'spec_id'       => $spec->id,
-                                'spec_value_id' => $specValue->id,
-                            ];
+                            $specValue = ProductSpecValue::create($valPayload);
+                        }
+
+                        $submittedValueIds[]               = $specValue->id;
+                        $specValueSpecIdMap[$specValue->id] = $spec->id;
+                        $specValueNameMap[$specValue->id]   = $valItem['value'];
+
+                        // 仅记录「需要图片」的规格项下的规格值图片，供 SKU 无图时兜底
+                        if (!empty($specItem['is_image_required'])) {
+                            $specValueImageMap[$specValue->id] = $valItem['image_url'] ?? '';
+                        }
+
+                        // 临时 ID 与真实 ID 的映射, 供本次请求内 SKU 绑定使用, 不落库
+                        if ($valId !== null && $valId !== '' && $this->isTempId($valId)) {
+                            $specValueUidMap[(string) $valId] = $specValue->id;
                         }
                     }
                 }
@@ -153,36 +188,46 @@ class ProductService
             // ==========================================
             $submittedSkuIds = [];    // 存储提交的SKU ID
             $skuSpecImages   = [];    // 存储 SKU 对应的规格值图片：sku_id => image_url
-            $prices          = [];    // 存储提交的价格
-            $totalStock      = 0;     // 存储总库存
-            $defaultSku      = null;  // 显式 is_default=1 的 SKU（只取第一个）
-            $firstSku        = null;  // 首个 SKU，无显式默认时兜底
 
             if (!empty($data['skus'])) {
                 foreach ($data['skus'] as $skuItem) {
-                    $skuId = $skuItem['id'] ?? null;
+                    // SKU 的 id 也允许是临时 ID, 非真实 ID 一律按新增处理
+                    $skuId = $this->isRealId($skuItem['id'] ?? null) ? (int) $skuItem['id'] : null;
 
-                    // 1) 依据 spec_values: {"颜色":"星云灰", ...} 解析真实的数据库 ID
+                    // 1) 解析 SKU 绑定的规格值: 真实 ID 直接使用, 临时 ID 查本次请求内的映射
                     $syncPivotData = []; // 供 sync 写入中间表的数据, 格式: [spec_value_id => ['spu_id' => x, 'spec_id' => y]]
                     $realValueIds  = []; // 存储写入的 sku id
 
-                    if (!empty($skuItem['spec_values'])) {
-                        foreach ($skuItem['spec_values'] as $specNameText => $specValueText) {
-                            $mapKey = $specNameText . '|' . $specValueText;
-                            if (isset($specValueMap[$mapKey])) {
-                                $specId = $specValueMap[$mapKey]['spec_id'];
-                                $specValueId = $specValueMap[$mapKey]['spec_value_id'];
+                    foreach ($skuItem['sku_spec'] ?? [] as $bound) {
+                        $valueId = $bound['id'] ?? null;
 
-                                $realValueIds[] = $specValueId;
-                                $syncPivotData[$specValueId] = [
-                                    'spu_id' => $spu->id,
-                                    'spec_id' => $specId,
-                                ];
-                            } else {
-                                throw new Exception("规格值 {$specNameText} | {$specValueText} 不存在");
-                            }
+                        if ($this->isRealId($valueId)) {
+                            $realValueId = (int) $valueId;
+                        } else {
+                            $realValueId = $specValueUidMap[(string) $valueId] ?? null;
                         }
+
+                        $specId = $realValueId ? ($specValueSpecIdMap[$realValueId] ?? null) : null;
+                        if (!$specId) {
+                            throw new Exception('SKU[' . ($skuItem['name'] ?? '') . "] 绑定的规格值 [{$valueId}] 不存在或不属于本次提交的规格");
+                        }
+
+                        // 前端传了规格值文本时校验一致性, 防止用陈旧数据完成绑定
+                        if (!empty($bound['spec_value_name']) && ($specValueNameMap[$realValueId] ?? null) !== $bound['spec_value_name']) {
+                            throw new Exception('SKU[' . ($skuItem['name'] ?? '') . "] 绑定的规格值【{$bound['spec_value_name']}】已变更，请刷新后重试");
+                        }
+
+                        $realValueIds[$realValueId]  = $realValueId;
+                        $syncPivotData[$realValueId] = [
+                            'spu_id'  => $spu->id,
+                            'spec_id' => $specId,
+                        ];
                     }
+
+                    if ($realValueIds === []) {
+                        throw new Exception('SKU[' . ($skuItem['name'] ?? '') . '] 未绑定任何规格值');
+                    }
+                    $realValueIds = array_values($realValueIds);
 
                     // 2) 解析规格值图片（SKU 自身无图时兜底）：map 中只会有「需要图片」规格项的图片
                     $specValueImage = '';
@@ -231,17 +276,6 @@ class ProductService
 
                     // 5) 同步更新 product_sku_spec_value 中间表
                     $sku->specValues()->sync($syncPivotData);
-
-                    $prices[]    = $sku->sale_price;
-                    $totalStock += $sku->stock;
-
-                    // 记录默认 SKU：优先第一个显式 is_default=1 的，避免后面的 SKU 覆盖
-                    if ($firstSku === null) {
-                        $firstSku = $sku;
-                    }
-                    if ($defaultSku === null && !empty($skuItem['is_default'])) {
-                        $defaultSku = $sku;
-                    }
                 }
             }
 
@@ -253,28 +287,75 @@ class ProductService
             // ==========================================
             // 6. 回写 SPU 聚合冗余统计字段
             // ==========================================
-            // 若没有任何 SKU 标记 is_default，则退回使用第一个 SKU
-            $defaultSku = $defaultSku ?: $firstSku;
+            $this->syncSpuAggregates((int) $spu->id, $skuSpecImages);
 
-            $sliderImages    = array_values($data['spu']['slider_images'] ?? []);
-            // 默认 SKU 图片优先级：SKU 自身图片 > 规格值图片 > SPU 轮播图首图
-            $defaultSkuImage = collect([
+            return $spu->refresh()->load(['skus.specValues.spec', 'categories', 'detail', 'specs.values']);
+        });
+    }
+
+    /**
+     * 回写 SPU 聚合冗余字段：最低/最高售价、总库存、默认 SKU 及其价格、库存、主图
+     *
+     * 统一聚合入口：任何会改变 SKU 的场景（SKU 单独编辑、库存变动等）都应调用此方法，
+     * 避免聚合字段与实际 SKU 数据不一致。
+     *
+     * @param  int        $spuId         SPU ID
+     * @param  array|null $skuSpecImages SKU 对应的规格值图片 [sku_id => image_url]；
+     *                                   传 null 表示不重算默认 SKU 主图，保留原值
+     */
+    public function syncSpuAggregates(int $spuId, ?array $skuSpecImages = null): void
+    {
+        $spu = ProductSpu::find($spuId);
+        if (!$spu) {
+            return;
+        }
+
+        // 与列表展示顺序保持一致：sort 升序，sort 相同按 id 升序
+        $skus = ProductSku::where('spu_id', $spuId)
+            ->orderBy('sort')
+            ->orderBy('id')
+            ->get(['id', 'sale_price', 'stock', 'image_url', 'is_default', 'sort']);
+
+        $prices = $skus->pluck('sale_price')->map(fn($price) => (float) $price)->all();
+
+        // 优先取显式 is_default=1 的 SKU，没有则用排序后的第一个兜底
+        $defaultSku = $skus->first(fn($sku) => (int) $sku->is_default === 1) ?: $skus->first();
+
+        $payload = [
+            'min_sale_price'         => $prices ? min($prices) : 0,
+            'max_sale_price'         => $prices ? max($prices) : 0,
+            'total_stock'            => (int) $skus->sum('stock'),
+            // default_sku_id 列为 NOT NULL，无 SKU 时写 0 而不是 null
+            'default_sku_id'         => $defaultSku ? (int) $defaultSku->id : 0,
+            'default_sku_sale_price' => $defaultSku ? $defaultSku->sale_price : 0,
+            'default_sku_stock'      => $defaultSku ? (int) $defaultSku->stock : 0,
+        ];
+
+        // 仅在显式传入规格值图片映射时重算主图，避免库存变更等场景把已有主图覆盖成空
+        if ($skuSpecImages !== null) {
+            $sliderImages = (array) $spu->slider_images;
+
+            // 默认 SKU 主图优先级：SKU 自身图片 > 规格值图片 > SPU 轮播图首图
+            $payload['default_sku_image_url'] = collect([
                 $defaultSku?->image_url,
-                $skuSpecImages[$defaultSku?->id] ?? '',
+                $defaultSku ? ($skuSpecImages[$defaultSku->id] ?? '') : '',
                 $sliderImages[0] ?? '',
             ])->filter()->first() ?? '';
-            $spu->update([
-                'min_sale_price'         => count($prices) ? min($prices) : 0,
-                'max_sale_price'         => count($prices) ? max($prices) : 0,
-                'total_stock'            => $totalStock,
-                'default_sku_id'         => $defaultSku ? $defaultSku->id : null,
-                'default_sku_sale_price' => $defaultSku ? $defaultSku->sale_price : 0,
-                'default_sku_stock'      => $defaultSku ? $defaultSku->stock : 0,
-                'default_sku_image_url'  => $defaultSkuImage,
-            ]);
+        }
 
-            return $spu->load(['skus.specValues.spec', 'categories', 'detail', 'specs.values']);
-        });
+        $spu->update($payload);
+    }
+
+    /** 真实数据库 ID: 正整数, 允许 null(未传 ID 视为新增) */
+    private function isRealId(int|string|null $id): bool
+    {
+        return (is_int($id) && $id > 0) || (is_string($id) && $id !== '' && ctype_digit($id) && (int) $id > 0);
+    }
+
+    /** 临时 ID: 非空字符串且含非数字字符 */
+    private function isTempId(int|string|null $id): bool
+    {
+        return is_string($id) && $id !== '' && ! ctype_digit($id);
     }
 
     /**

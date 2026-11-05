@@ -3943,8 +3943,15 @@
                                             "type": "object",
                                             "properties": {
                                                 "id": {
-                                                    "type": "integer",
-                                                    "example": 1
+                                                    "oneOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "string"
+                                                        }
+                                                    ],
+                                                    "description": "真实数据库 ID（纯数字，编辑已存在记录）或临时 ID（含非数字字符，新增记录），两者都不传视为新增"
                                                 },
                                                 "name": {
                                                     "type": "string",
@@ -3985,8 +3992,15 @@
                                                         "type": "object",
                                                         "properties": {
                                                             "id": {
-                                                                "type": "integer",
-                                                                "example": 1
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    {
+                                                                        "type": "string"
+                                                                    }
+                                                                ],
+                                                                "description": "真实数据库 ID 或临时 ID（需含非数字字符），临时 ID 仅本次请求内有效"
                                                             },
                                                             "value": {
                                                                 "type": "string",
@@ -4056,9 +4070,12 @@
                                                 "volume": 0.01,
                                                 "status": 1,
                                                 "sort": 1,
-                                                "spec_values": {
-                                                    "颜色": "黑色"
-                                                }
+                                                "sku_spec": [
+                                                    {
+                                                        "id": "tmp_0_0",
+                                                        "spec_value_name": "黑色"
+                                                    }
+                                                ]
                                             }
                                         ],
                                         "items": {
@@ -4130,15 +4147,40 @@
                                                     "minimum": 0,
                                                     "example": 1
                                                 },
-                                                "spec_values": {
-                                                    "type": "object",
-                                                    "description": "SKU 规格属性，键为规格名，值为规格值",
-                                                    "additionalProperties": {
-                                                        "type": "string"
+                                                "sku_spec": {
+                                                    "type": "array",
+                                                    "minItems": 1,
+                                                    "description": "SKU 规格值绑定。每项 id 为规格值的真实数据库 ID（整数）或临时 ID（含字母的字符串）；必须覆盖所有规格项，且每个规格项恰好一个值。spec_value_name 可选，传了会与提交的规格值文本比对",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    {
+                                                                        "type": "string"
+                                                                    }
+                                                                ],
+                                                                "description": "规格值真实 ID 或临时 ID"
+                                                            },
+                                                            "spec_value_name": {
+                                                                "type": "string",
+                                                                "maxLength": 64,
+                                                                "description": "规格值文本，可选；传了则做一致性校验，不一致说明前端数据已过期"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id"
+                                                        ]
                                                     },
-                                                    "example": {
-                                                        "颜色": "黑色"
-                                                    }
+                                                    "example": [
+                                                        {
+                                                            "id": "tmp_0_0",
+                                                            "spec_value_name": "黑色"
+                                                        }
+                                                    ]
                                                 }
                                             },
                                             "required": [
@@ -4147,7 +4189,7 @@
                                                 "sale_price",
                                                 "stock",
                                                 "status",
-                                                "spec_values"
+                                                "sku_spec"
                                             ],
                                             "example": {
                                                 "is_default": 1,
@@ -4161,9 +4203,12 @@
                                                 "volume": 0.01,
                                                 "status": 1,
                                                 "sort": 1,
-                                                "spec_values": {
-                                                    "颜色": "黑色"
-                                                }
+                                                "sku_spec": [
+                                                    {
+                                                        "id": "tmp_0_0",
+                                                        "spec_value_name": "黑色"
+                                                    }
+                                                ]
                                             }
                                         }
                                     }
@@ -4228,9 +4273,12 @@
                                             "volume": 0.01,
                                             "status": 1,
                                             "sort": 1,
-                                            "spec_values": {
-                                                "颜色": "黑色"
-                                            }
+                                            "sku_spec": [
+                                                {
+                                                    "id": "tmp_0_0",
+                                                    "spec_value_name": "黑色"
+                                                }
+                                            ]
                                         }
                                     ]
                                 }
@@ -4289,9 +4337,12 @@
                                         "volume": 0.01,
                                         "status": 1,
                                         "sort": 1,
-                                        "spec_values": {
-                                            "颜色": "黑色"
-                                        }
+                                        "sku_spec": [
+                                            {
+                                                "id": "tmp_0_0",
+                                                "spec_value_name": "黑色"
+                                            }
+                                        ]
                                     }
                                 ]
                             }
@@ -4807,8 +4858,15 @@
                                             "type": "object",
                                             "properties": {
                                                 "id": {
-                                                    "type": "integer",
-                                                    "example": 1
+                                                    "oneOf": [
+                                                        {
+                                                            "type": "integer"
+                                                        },
+                                                        {
+                                                            "type": "string"
+                                                        }
+                                                    ],
+                                                    "description": "真实数据库 ID（纯数字，编辑已存在记录）或临时 ID（含非数字字符，新增记录），两者都不传视为新增"
                                                 },
                                                 "name": {
                                                     "type": "string",
@@ -4838,8 +4896,15 @@
                                                         "type": "object",
                                                         "properties": {
                                                             "id": {
-                                                                "type": "integer",
-                                                                "example": 1
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    {
+                                                                        "type": "string"
+                                                                    }
+                                                                ],
+                                                                "description": "真实数据库 ID 或临时 ID（需含非数字字符），临时 ID 仅本次请求内有效"
                                                             },
                                                             "value": {
                                                                 "type": "string",
@@ -4944,12 +5009,33 @@
                                                     "minimum": 0,
                                                     "example": 1
                                                 },
-                                                "spec_values": {
+                                                "sku_spec": {
                                                     "type": "array",
-                                                    "description": "SKU 规格属性配置不能为空",
-                                                    "example": [],
+                                                    "minItems": 1,
+                                                    "description": "SKU 规格值绑定。每项 id 为规格值的真实数据库 ID（整数）或临时 ID（含字母的字符串）；必须覆盖所有规格项，且每个规格项恰好一个值。spec_value_name 可选，传了会与提交的规格值文本比对",
                                                     "items": {
-                                                        "type": "string"
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "oneOf": [
+                                                                    {
+                                                                        "type": "integer"
+                                                                    },
+                                                                    {
+                                                                        "type": "string"
+                                                                    }
+                                                                ],
+                                                                "description": "规格值真实 ID 或临时 ID"
+                                                            },
+                                                            "spec_value_name": {
+                                                                "type": "string",
+                                                                "maxLength": 64,
+                                                                "description": "规格值文本，可选；传了则做一致性校验，不一致说明前端数据已过期"
+                                                            }
+                                                        },
+                                                        "required": [
+                                                            "id"
+                                                        ]
                                                     }
                                                 }
                                             },
@@ -4959,7 +5045,7 @@
                                                 "sale_price",
                                                 "stock",
                                                 "status",
-                                                "spec_values"
+                                                "sku_spec"
                                             ]
                                         }
                                     }
@@ -5174,37 +5260,6 @@
                                                         "spec_value_id": 63,
                                                         "spec_value": "晨曦金"
                                                     }
-                                                ],
-                                                "spec_values": [
-                                                    {
-                                                        "id": 63,
-                                                        "spu_id": 10,
-                                                        "spec_id": 22,
-                                                        "value": "晨曦金",
-                                                        "image_url": "https://cdn.example.com/spec/63.png",
-                                                        "sort": 1,
-                                                        "created_at": "2026-09-23 11:57:34",
-                                                        "updated_at": "2026-10-19 17:33:48",
-                                                        "created_at_ts": 1790135854,
-                                                        "updated_at_ts": 1792402428,
-                                                        "pivot": {
-                                                            "sku_id": 112,
-                                                            "spec_value_id": 63,
-                                                            "spu_id": 10,
-                                                            "spec_id": 22
-                                                        },
-                                                        "spec": {
-                                                            "id": 22,
-                                                            "spu_id": 10,
-                                                            "name": "颜色",
-                                                            "is_image_required": 1,
-                                                            "sort": 1,
-                                                            "created_at": "2026-09-23 11:57:34",
-                                                            "updated_at": "2026-10-19 17:33:48",
-                                                            "created_at_ts": 1790135854,
-                                                            "updated_at_ts": 1792402428
-                                                        }
-                                                    }
                                                 ]
                                             }
                                         ]
@@ -5234,7 +5289,7 @@
                         }
                     }
                 },
-                "description": "需要权限：product.show。返回 SPU 详情及关联数据：brand 品牌、creator/updater 操作人、detail 详情富文本、categories 分类、specs 规格树（含 values）、skus SKU 列表。每个 SKU 含 sku_specs 规格列表（[{spec_id, spec_name, spec_value_id, spec_value}]）与 spec_values 规格值关联（含 spec 规格项）；spec_json 字段已移除。",
+                "description": "需要权限：product.show。返回 SPU 详情及关联数据：brand 品牌、creator/updater 操作人、detail 详情富文本、categories 分类、specs 规格树（含 values）、skus SKU 列表。每个 SKU 只输出 sku_specs 规格列表（[{spec_id, spec_name, spec_value_id, spec_value}]），不再输出 spec_values 规格值关联与 spec_json 字段。",
                 "x-apifox-folder": "后台/商品管理"
             }
         },

@@ -21,6 +21,13 @@ class FetchProductRequestCommand extends Command
     private const CATEGORY_IDS = [18];
 
     /**
+     * 「规格名|规格值」 => 临时 ID，新增商品时数据库还没有真实 ID，用它让 SKU 完成绑定
+     *
+     * @var array<string, string>
+     */
+    private array $specValueUidMap = [];
+
+    /**
      * 商品页 URL 前缀
      */
     private const TARGET_URL_PREFIX = 'https://m.vmall.com/product/comdetail/index.html?';
@@ -104,11 +111,14 @@ class FetchProductRequestCommand extends Command
         }
 
         // 3. 映射组装保存所需的数据结构
+        // specs 需先执行: 它会为新增规格值生成临时 ID, 供 skus 绑定使用
+        $specs = $this->specs($current);
+
         return [
             'category_ids' => self::CATEGORY_IDS,
             'detail'       => $this->detail($pageProps),
             'skus'         => $this->skus($current),
-            'specs'        => $this->specs($current),
+            'specs'        => $specs,
             'spu'          => $this->spu($current),
         ];
     }
@@ -178,6 +188,7 @@ class FetchProductRequestCommand extends Command
      */
     private function specs(array $current): array
     {
+        $this->specValueUidMap = [];
         $nameOrder = [];
         $values = [];
         $valueImages = [];
@@ -208,7 +219,12 @@ class FetchProductRequestCommand extends Command
 
             $valueRows = [];
             foreach (array_keys($values[$name]) as $valueIndex => $value) {
+                // 新增商品的规格值尚无数据库 ID，生成临时 ID 供 SKU 绑定（含字母，不会被误判为真实 ID）
+                $uid = 'tmp_' . $nameIndex . '_' . $valueIndex;
+                $this->specValueUidMap[$name . '|' . $value] = $uid;
+
                 $valueRows[] = [
+                    'id'        => $uid,
                     'image_url' => $isColor ? ($valueImages[$name][$value] ?? '') : '',
                     'sort'      => $valueIndex + 1,
                     'value'     => $value,
@@ -238,12 +254,23 @@ class FetchProductRequestCommand extends Command
         $skus = [];
 
         foreach ($current['base'] ?? [] as $sbomCode => $sku) {
-            $specValues = [];
+            $skuSpec = [];
             foreach ($sku['gbomAttrList'] ?? [] as $attr) {
-                $name = $attr['attrName'] ?? '';
-                if ($name !== '') {
-                    $specValues[$name] = $attr['attrValue'] ?? '';
+                $name  = $attr['attrName'] ?? '';
+                $value = $attr['attrValue'] ?? '';
+                if ($name === '' || $value === '') {
+                    continue;
                 }
+
+                $uid = $this->specValueUidMap[$name . '|' . $value] ?? null;
+                if ($uid === null) {
+                    throw new RuntimeException("规格值 {$name}:{$value} 未在 specs 中生成临时 ID");
+                }
+
+                $skuSpec[] = [
+                    'id'              => $uid,
+                    'spec_value_name' => $value,
+                ];
             }
 
             $price = (float) ($sku['price'] ?? 0);
@@ -255,8 +282,8 @@ class FetchProductRequestCommand extends Command
                 'name'         => $sku['name'] ?? '',
                 'sale_price'   => $price,
                 'sku_code'     => (string) ($sku['sbomCode'] ?? $sbomCode),
+                'sku_spec'     => $skuSpec,
                 'sort'         => count($skus) + 1,
-                'spec_values'  => (object) $specValues,
                 'status'       => 1,
                 'stock'        => (int) ($sku['inventory'] ?? 0),
                 'strike_price' => $price,

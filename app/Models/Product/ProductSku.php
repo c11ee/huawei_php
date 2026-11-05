@@ -18,6 +18,12 @@ class ProductSku extends BaseModel
         // 'status' => 'boolean',
     ];
 
+    protected $hidden = [
+        // 规格信息统一由 sku_specs 输出, 不再返回原始规格值关联
+        // 关联按方法名隐藏, 序列化后对应 spec_values
+        'specValues',
+    ];
+
     public function spu(): BelongsTo
     {
         return $this->belongsTo(ProductSpu::class, 'spu_id');
