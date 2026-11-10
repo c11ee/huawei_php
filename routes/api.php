@@ -75,6 +75,7 @@ Route::prefix('api')->group(function () {
             });
 
             Route::prefix('cart')->group(function () {
+                Route::get('/count', [CartController::class, 'count']);
                 Route::get('/', [CartController::class, 'index']);
                 Route::post('/', [CartController::class, 'store']);
                 Route::put('/checked', [CartController::class, 'updateChecked']);

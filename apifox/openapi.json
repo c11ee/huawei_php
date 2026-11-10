@@ -7019,7 +7019,7 @@
                                         "description": "SKU ID（product_sku.id），必须存在",
                                         "example": 10
                                     },
-                                    "num": {
+                                    "quantity": {
                                         "type": "integer",
                                         "minimum": 1,
                                         "description": "添加数量，SKU 已在该用户购物车中时累加",
@@ -7028,7 +7028,7 @@
                                 },
                                 "required": [
                                     "sku_id",
-                                    "num"
+                                    "quantity"
                                 ]
                             }
                         }

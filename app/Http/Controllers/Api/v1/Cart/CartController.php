@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\DB;
 
 class CartController extends Controller
 {
+    /**
+     * 获取购物车商品数量
+     */
+    public function count(Request $request)
+    {
+        $row = $request->user()->cartItems()
+            ->selectRaw('COUNT(*) AS item_count, COALESCE(SUM(quantity), 0) AS total_quantity')
+            ->first();
+        return ApiResponse::success([
+            'item_count'     => $row->item_count ?? 0,
+            'total_quantity' => $row->total_quantity ?? 0,
+        ]);
+    }
+
     public function index(Request $request)
     {
         // 预加载 SKU 规格与品牌，避免逐项懒加载；SPU 带软删除，保证商品删除后购物车仍能展示
@@ -55,8 +69,8 @@ class CartController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'sku_id' => ['required', 'integer'],
-            'num' => ['required', 'integer', 'min:1'],
+            'sku_id'   => ['required', 'integer'],
+            'quantity' => ['required', 'integer', 'min:1'],
         ]);
 
         $sku = ProductSku::with(['spu.brand', 'specValues.spec'])->findOrFail($validated['sku_id']);
@@ -67,14 +81,15 @@ class CartController extends Controller
             return ApiResponse::error('商品已下架');
         }
 
-        // 可用库存 = 总库存 - 已锁定
-        $available = max(0, $sku->stock - $sku->locked_stock);
-        if ($available === 0) {
-            return ApiResponse::error('库存不足');
-        }
+        // // 可用库存 = 总库存 - 已锁定
+        // $available = max(0, $sku->stock - $sku->locked_stock);
+        // if ($available === 0) {
+        //     return ApiResponse::error('库存不足');
+        // }
 
         // 单次加购数量不能超过可用库存
-        $quantity = min($validated['num'], $available);
+        // $quantity = min($validated['quantity'], $available);
+        $quantity = $validated['quantity'];
 
         $snapshot = $this->buildSnapshot($sku);
 
@@ -101,15 +116,15 @@ class CartController extends Controller
         }
 
         // 已达可用库存时提示用户, 否则直接累加(超出部分由 LEAST 截断)
-        if ($cartItem->quantity >= $available) {
-            return ApiResponse::error('库存不足，购物车已达该商品库存上限');
-        }
+        // if ($cartItem->quantity >= $available) {
+        //     return ApiResponse::error('库存不足，购物车已达该商品库存上限');
+        // }
 
-        // 累加在数据库内完成, LEAST 兜底防止并发下超出可用库存; 同时刷新快照, 保证商品删除后回退展示的是最新数据
+        // 已在购物车: 累加数量并刷新快照(商品删除后展示的是最新数据)
         $request->user()->cartItems()
             ->where('sku_id', $sku->id)
             ->update([
-                'quantity'      => DB::raw(sprintf('LEAST(quantity + %d, %d)', $quantity, $available)),
+                'quantity'      => DB::raw('quantity + ' . (int) $quantity),
                 // Eloquent 的批量 update 不走模型 cast, 需手动转 JSON
                 'snapshot_json' => json_encode($snapshot),
             ]);
