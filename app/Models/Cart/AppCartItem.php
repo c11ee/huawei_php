@@ -48,16 +48,17 @@ class AppCartItem extends BaseModel
         // SKU 或所属 SPU 已被删除(含软删): 完全依赖快照
         if (!$sku || !$sku->spu) {
             return array_merge([
-                'spu_id'     => 0,
-                'spu_name'   => '',
-                'sku_name'   => '',
-                'image_url'  => '',
-                'sale_price' => 0,
-                'stock'      => 0,
-                'sku_specs'  => [],
-                'brand_id'   => 0,
-                'brand_name' => '',
-                'brand_logo' => '',
+                'spu_id'       => 0,
+                'spu_name'     => '',
+                'sku_name'     => '',
+                'image_url'    => '',
+                'sale_price'   => 0,
+                'strike_price' => 0,
+                'stock'        => 0,
+                'sku_specs'    => [],
+                'brand_id'     => 0,
+                'brand_name'   => '',
+                'brand_logo'   => '',
             ], $snapshot, ['offline_reason' => 'deleted']);
         }
 
@@ -73,6 +74,7 @@ class AppCartItem extends BaseModel
             'sku_name'       => $sku->name,
             'image_url'      => $sku->image_url ?: ($snapshot['image_url'] ?? ''),
             'sale_price'     => $sku->sale_price,
+            'strike_price'   => $sku->strike_price,
             'stock'          => $sku->stock,
             'sku_specs'      => $sku->sku_specs,
             'brand_id'       => $sku->spu?->brand_id ?? ($snapshot['brand_id'] ?? 0),

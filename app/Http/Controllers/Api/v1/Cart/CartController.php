@@ -284,16 +284,17 @@ class CartController extends Controller
         $spu = $sku->spu;
 
         return [
-            'spu_id'     => $sku->spu_id,
-            'spu_name'   => $spu->product_name ?? '',
-            'sku_name'   => $sku->name,
-            'image_url'  => $sku->image_url ?: ($spu->default_sku_image_url ?? ''),
-            'sale_price' => $sku->sale_price,
-            'sku_specs'  => $sku->sku_specs,
-            'brand_id'   => $spu->brand_id ?? 0,
-            'brand_name' => $spu->brand?->name ?? '',
-            'brand_logo' => $spu->brand?->logo ?? '',
-            'stock'      => $sku->stock,
+            'spu_id'       => $sku->spu_id,
+            'spu_name'     => $spu->product_name ?? '',
+            'sku_name'     => $sku->name,
+            'image_url'    => $sku->image_url ?: ($spu->default_sku_image_url ?? ''),
+            'sale_price'   => $sku->sale_price,
+            'strike_price' => $sku->strike_price,
+            'sku_specs'    => $sku->sku_specs,
+            'brand_id'     => $spu->brand_id ?? 0,
+            'brand_name'   => $spu->brand?->name ?? '',
+            'brand_logo'   => $spu->brand?->logo ?? '',
+            'stock'        => $sku->stock,
         ];
     }
 }
