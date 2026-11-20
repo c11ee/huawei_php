@@ -101,6 +101,7 @@ class CartController extends Controller
                 $request->user()->cartItems()->create([
                     'sku_id'        => $sku->id,
                     'quantity'      => $quantity,
+                    'is_checked'    => 1,
                     'snapshot_json' => $snapshot,
                 ]);
 
