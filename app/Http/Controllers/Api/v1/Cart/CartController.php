@@ -227,27 +227,30 @@ class CartController extends Controller
             return ApiResponse::error('商品已下架');
         }
 
-        // 可用库存 = 总库存 - 已锁定
-        $available = max(0, $sku->stock - $sku->locked_stock);
-        if ($available === 0) {
-            return ApiResponse::error('库存不足');
-        }
+        // // 可用库存 = 总库存 - 已锁定
+        // $available = max(0, $sku->stock - $sku->locked_stock);
+        // if ($available === 0) {
+        //     return ApiResponse::error('库存不足');
+        // }
 
         $snapshot = $this->buildSnapshot($sku);
 
-        [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot, $available) {
+        // [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot, $available) {
+        [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot) {
             // 目标规格已在购物车: 合并数量(不超过可用库存)后删除当前项
             $target = $user->cartItems()->where('sku_id', $sku->id)->lockForUpdate()->first();
 
             if ($target) {
-                $quantity = min($target->quantity + $cartItem->quantity, $available);
+                // $quantity = min($target->quantity + $cartItem->quantity, $available);
+                $quantity = $target->quantity + $cartItem->quantity;
                 $target->update(['quantity' => $quantity, 'snapshot_json' => $snapshot]);
                 $cartItem->delete();
 
                 return [$target->id, $quantity, true];
             }
 
-            $quantity = min($cartItem->quantity, $available);
+            // $quantity = min($cartItem->quantity, $available);
+            $quantity = $cartItem->quantity;
             $cartItem->update([
                 'sku_id'        => $sku->id,
                 'quantity'      => $quantity,
@@ -284,18 +287,26 @@ class CartController extends Controller
     {
         $spu = $sku->spu;
 
+        // 带图片的规格值：当前 SKU 绑定的规格值中，所属规格项 is_image_required = 1 的那一个
+        $imageSpecValue = $sku->specValues->first(
+            fn($specValue) => (int)($specValue->spec?->is_image_required ?? 0) === 1
+        );
+        // 对应规格值的图片
+        $specImageUrl = $imageSpecValue?->image_url ?: '';
+
         return [
-            'spu_id'       => $sku->spu_id,
-            'spu_name'     => $spu->product_name ?? '',
-            'sku_name'     => $sku->name,
-            'image_url'    => $sku->image_url ?: ($spu->default_sku_image_url ?? ''),
-            'sale_price'   => $sku->sale_price,
-            'strike_price' => $sku->strike_price,
-            'sku_specs'    => $sku->sku_specs,
-            'brand_id'     => $spu->brand_id ?? 0,
-            'brand_name'   => $spu->brand?->name ?? '',
-            'brand_logo'   => $spu->brand?->logo ?? '',
-            'stock'        => $sku->stock,
+            'spu_id'             => $sku->spu_id,
+            'spu_name'           => $spu->product_name ?? '',
+            'product_short_name' => $spu->product_short_name ?? '',
+            'sku_name'           => $sku->name,
+            'image_url'          => $sku->image_url ?: $specImageUrl ?: ($spu->default_sku_image_url ?? ''),
+            'sale_price'         => $sku->sale_price,
+            'strike_price'       => $sku->strike_price,
+            'sku_specs'          => $sku->sku_specs,
+            'brand_id'           => $spu->brand_id ?? 0,
+            'brand_name'         => $spu->brand?->name ?? '',
+            'brand_logo'         => $spu->brand?->logo ?? '',
+            'stock'              => $sku->stock,
         ];
     }
 }

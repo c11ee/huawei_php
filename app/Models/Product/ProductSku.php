@@ -73,10 +73,11 @@ class ProductSku extends BaseModel
         return $specValues
             ->sortBy(fn($item) => $item->spec?->sort ?? 0)
             ->map(fn($item) => [
-                'spec_id'       => $item->pivot->spec_id,
-                'spec_name'     => $item->spec?->name ?? '',
-                'spec_value_id' => $item->id,
-                'spec_value'    => $item->value,
+                'is_image_required' => $item->spec->is_image_required,
+                'spec_id'           => $item->pivot->spec_id,
+                'spec_name'         => $item->spec?->name ?? '',
+                'spec_value_id'     => $item->id,
+                'spec_value'        => $item->value,
             ])
             ->values()
             ->all();
