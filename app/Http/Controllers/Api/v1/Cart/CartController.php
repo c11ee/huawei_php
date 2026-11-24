@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\v1\Cart;
 
 use App\Http\Controllers\Controller;
 use App\Http\Responses\ApiResponse;
+use App\Models\Cart\AppCartItem;
 use App\Models\Product\ProductSku;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
@@ -36,26 +37,19 @@ class CartController extends Controller
             ->latest('id')
             ->get();
 
-        // dd($cartItems->toArray());
-        // 每项只执行一次 product 访问器，避免分组与序列化重复计算
-        $rows = $cartItems->map(fn($item) => [
-            'item'    => $item->makeHidden(['sku', 'snapshot_json'])->toArray(),
-            'product' => $item->product,
-        ]);
-
-        $groups = $rows
-            ->groupBy(fn($row) => $row['product']['brand_id'])
-            ->map(function ($rows, $brandId) {
-                $first = $rows->first()['product'];
+        // 按品牌分组；条目结构统一由 formatCartItem 组装
+        $groups = $cartItems
+            ->map(fn($item) => $this->formatCartItem($item))
+            ->groupBy(fn($item) => $item['product']['brand_id'])
+            ->map(function ($items, $brandId) {
+                $first = $items->first()['product'];
 
                 return [
                     'brand_id'   => (int) $brandId,
                     'brand_name' => $first['brand_name'],
                     'brand_logo' => $first['brand_logo'],
-                    'item_count' => $rows->count(),
-                    'items'      => $rows
-                        ->map(fn($row) => $row['item'] + ['product' => $row['product']])
-                        ->values()
+                    'item_count' => $items->count(),
+                    'items'      => $items->values(),
                 ];
             })
             ->values();
@@ -202,8 +196,7 @@ class CartController extends Controller
         // 规格未变化, 直接返回当前数量
         if ((int) $cartItem->sku_id === (int) $validated['sku_id']) {
             return ApiResponse::success([
-                'cart_id'  => $cartItem->id,
-                'quantity' => $cartItem->quantity,
+                'cart'     => $this->formatCartItem($cartItem),
                 'merged'   => false,
             ]);
         }
@@ -236,7 +229,7 @@ class CartController extends Controller
         $snapshot = $this->buildSnapshot($sku);
 
         // [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot, $available) {
-        [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot) {
+        [$target, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot) {
             // 目标规格已在购物车: 合并数量(不超过可用库存)后删除当前项
             $target = $user->cartItems()->where('sku_id', $sku->id)->lockForUpdate()->first();
 
@@ -246,23 +239,23 @@ class CartController extends Controller
                 $target->update(['quantity' => $quantity, 'snapshot_json' => $snapshot]);
                 $cartItem->delete();
 
-                return [$target->id, $quantity, true];
+                return [$target, true];
             }
 
             // $quantity = min($cartItem->quantity, $available);
             $quantity = $cartItem->quantity;
             $cartItem->update([
                 'sku_id'        => $sku->id,
-                'quantity'      => $quantity,
                 'snapshot_json' => $snapshot,
             ]);
+            // 上面读取 spu_id 时已缓存旧 sku 关联, 切换后需清掉, 保证 product 用新 SKU 组装
+            $cartItem->unsetRelation('sku');
 
-            return [$cartItem->id, $quantity, false];
+            return [$cartItem, false];
         });
 
         return ApiResponse::success([
-            'cart_id'  => $targetId,
-            'quantity' => $quantity,
+            'cart'     => $this->formatCartItem($target),
             'merged'   => $merged,
         ]);
     }
@@ -280,6 +273,20 @@ class CartController extends Controller
         $request->user()->cartItems()->whereIn('id', $ids)->delete();
 
         return ApiResponse::success([]);
+    }
+
+    /** 组装与列表一致的购物车条目结构: 条目字段 + product 展示信息 */
+    private function formatCartItem(AppCartItem $item): array
+    {
+        // 只补加载缺失的关联：列表已预加载，切换规格时按需加载
+        $item->loadMissing([
+            'sku.specValues.spec',
+            'sku.spu' => fn($q) => $q->withTrashed()->with('brand'),
+        ]);
+
+        return $item->makeHidden(['sku', 'snapshot_json'])->toArray() + [
+            'product' => $item->product,
+        ];
     }
 
     /** 构建购物车商品快照, 商品被删除后用于兜底展示 */
