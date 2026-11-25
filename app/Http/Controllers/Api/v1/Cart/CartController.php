@@ -228,13 +228,11 @@ class CartController extends Controller
 
         $snapshot = $this->buildSnapshot($sku);
 
-        // [$targetId, $quantity, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot, $available) {
         [$target, $merged] = DB::transaction(function () use ($user, $cartItem, $sku, $snapshot) {
-            // 目标规格已在购物车: 合并数量(不超过可用库存)后删除当前项
+            // 目标规格已在购物车: 合并数量后删除当前项
             $target = $user->cartItems()->where('sku_id', $sku->id)->lockForUpdate()->first();
 
             if ($target) {
-                // $quantity = min($target->quantity + $cartItem->quantity, $available);
                 $quantity = $target->quantity + $cartItem->quantity;
                 $target->update(['quantity' => $quantity, 'snapshot_json' => $snapshot]);
                 $cartItem->delete();
@@ -242,7 +240,6 @@ class CartController extends Controller
                 return [$target, true];
             }
 
-            // $quantity = min($cartItem->quantity, $available);
             $quantity = $cartItem->quantity;
             $cartItem->update([
                 'sku_id'        => $sku->id,
