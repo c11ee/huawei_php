@@ -6912,8 +6912,8 @@
                     "购物车"
                 ],
                 "summary": "购物车列表",
-                "description": "按品牌分组返回当前登录用户的购物车项，items 按加入时间倒序。分组节点包含 brand_id、brand_name、brand_logo、item_count 与 items；每个购物车项包含 id、sku_id、quantity、is_checked 等字段，以及 product 商品展示信息（spu_id、spu_name、sku_name、image_url、sale_price、stock、sku_specs、brand_id、brand_name、brand_logo、offline_reason）。sku_specs 为该 SKU 的规格列表，形如 [{spec_id, spec_name, spec_value_id, spec_value}]。商品未被删除时 product 取实时数据，offline_reason 为空字符串；商品被删除（含软删）时 product 回退到加购时的快照，offline_reason=deleted；商品下架时 offline_reason=offline；库存为 0 时 offline_reason=out_of_stock。sku 与 snapshot_json 不返回。",
                 "operationId": "get.api.v1.cart",
+                "description": "按品牌分组返回当前登录用户的购物车项，items 按加入时间（id）倒序。分组节点包含 brand_id、brand_name、brand_logo、item_count 与 items；每个购物车项包含 id、user_id、sku_id、quantity、is_checked、created_at、updated_at、created_at_ts、updated_at_ts 以及 product 商品展示信息，不返回 sku 与 snapshot_json。product 为商品展示信息：spu_id、spu_name、product_short_name、sku_name、image_url、sale_price、strike_price、stock、sku_specs、brand_id、brand_name、brand_logo、offline_reason。sku_specs 为该 SKU 的规格列表，形如 [{spec_id, spec_name, spec_value_id, spec_value}]。offline_reason 取值：空字符串表示正常；offline 表示 SKU 或所属 SPU 已下架/已删除；out_of_stock 表示库存为 0；deleted 表示 SKU 或 SPU 已被删除（含软删），此时 product 回退到加购时写入的快照数据。",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/AppAuthorization"
@@ -6935,12 +6935,12 @@
                                             "brand_id": 1,
                                             "brand_name": "华为",
                                             "brand_logo": "https://cdn.example.com/brand/1.png",
-                                            "item_count": 2,
+                                            "item_count": 1,
                                             "items": [
                                                 {
-                                                    "id": 1,
+                                                    "id": 88,
                                                     "user_id": 1,
-                                                    "sku_id": 10,
+                                                    "sku_id": 113,
                                                     "quantity": 2,
                                                     "is_checked": 1,
                                                     "created_at": "2026-10-30 10:00:00",
@@ -6950,9 +6950,11 @@
                                                     "product": {
                                                         "spu_id": 3,
                                                         "spu_name": "HUAWEI Mate 70",
+                                                        "product_short_name": "Mate 70",
                                                         "sku_name": "HUAWEI Mate 70 曜石黑 256G",
-                                                        "image_url": "https://cdn.example.com/sku/10.jpg",
+                                                        "image_url": "https://cdn.example.com/sku/113.jpg",
                                                         "sale_price": "1299.00",
+                                                        "strike_price": "1599.00",
                                                         "stock": 100,
                                                         "sku_specs": [
                                                             {
@@ -6999,8 +7001,8 @@
                     "购物车"
                 ],
                 "summary": "添加购物车",
-                "description": "同一用户同一 SKU 只保留一条记录，已存在时累加数量（quantity = quantity + num）。校验顺序：SKU 未启用、或所属 SPU 已下架/已删除 → HTTP 200、code=0、msg=商品已下架；可用库存（stock - locked_stock）不足（含购物车中已有数量）→ HTTP 200、code=0、msg=库存不足。加购时写入商品快照，用于商品后续被删除后的展示兜底。",
                 "operationId": "post.api.v1.cart",
+                "description": "同一用户同一 SKU 只保留一条记录，已存在时累加数量（quantity = quantity + quantity），并刷新商品快照。首次加购默认选中（is_checked=1）。校验规则：sku_id 对应 SKU 不存在 → HTTP 404；SKU 未启用，或所属 SPU 已下架/已删除 → HTTP 200、code=0、msg=商品已下架。加购时写入商品快照，用于商品后续被删除后的展示兜底；并发首次加购命中唯一索引时自动转为累加。",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/AppAuthorization"
@@ -7012,31 +7014,30 @@
                         "application/json": {
                             "schema": {
                                 "type": "object",
+                                "required": [
+                                    "sku_id",
+                                    "quantity"
+                                ],
                                 "properties": {
                                     "sku_id": {
                                         "type": "integer",
-                                        "minimum": 1,
                                         "description": "SKU ID（product_sku.id），必须存在",
-                                        "example": 10
+                                        "example": 113
                                     },
                                     "quantity": {
                                         "type": "integer",
                                         "minimum": 1,
-                                        "description": "添加数量，SKU 已在该用户购物车中时累加",
+                                        "description": "添加数量；SKU 已在该用户购物车中时累加",
                                         "example": 1
                                     }
-                                },
-                                "required": [
-                                    "sku_id",
-                                    "quantity"
-                                ]
+                                }
                             }
                         }
                     }
                 },
                 "responses": {
                     "200": {
-                        "description": "成功（商品已下架时 data 为空、code=0）",
+                        "description": "成功（商品已下架时 code=0、msg=商品已下架）",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7073,8 +7074,18 @@
                             }
                         }
                     },
+                    "404": {
+                        "description": "资源不存在或不属于当前用户",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
                     "422": {
-                        "description": "参数校验失败（sku_id 不存在或 num 小于 1）",
+                        "description": "参数校验失败（sku_id 或 quantity 缺失、类型错误、quantity 小于 1）",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7091,8 +7102,8 @@
                     "购物车"
                 ],
                 "summary": "删除购物车项",
-                "description": "按 ids 批量删除当前登录用户的购物车项（物理删除，不可恢复）。只删除属于当前用户的记录，不存在或不属于本人的 id 会被忽略。",
                 "operationId": "delete.api.v1.cart",
+                "description": "按 ids 批量删除当前登录用户的购物车项（物理删除，不可恢复）。只删除属于当前用户的记录，不存在或不属于本人的 id 会被忽略。",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/AppAuthorization"
@@ -7231,6 +7242,11 @@
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
                                 }
                             }
                         }
@@ -7259,6 +7275,52 @@
                 "x-apifox-folder": "前台/购物车"
             }
         },
+        "/api/v1/cart/count": {
+            "get": {
+                "tags": [
+                    "购物车"
+                ],
+                "summary": "获取购物车商品数量",
+                "operationId": "get.api.v1.cart.count",
+                "description": "统计当前登录用户购物车中的条目数与商品总数量，不区分是否选中。item_count 为购物车条目数，total_quantity 为所有条目的数量之和。",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "item_count": 2,
+                                        "total_quantity": 5
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/购物车"
+            }
+        },
         "/api/v1/cart/quantity/{id}": {
             "put": {
                 "tags": [
@@ -7266,7 +7328,7 @@
                 ],
                 "summary": "修改购物车商品数量",
                 "operationId": "put.api.v1.cart.quantity.id",
-                "description": "修改单个购物车项的数量，数量最小为 1，且不能超过可用库存（stock - locked_stock）。",
+                "description": "修改单个购物车项的数量，数量最小为 1。校验规则：购物车项不存在或不属于当前用户 → HTTP 404；SKU 已被删除 → HTTP 200、code=0、msg=商品不存在；SKU 或所属 SPU 已下架/已删除 → code=0、msg=商品已下架；可用库存（stock - locked_stock）为 0 → code=0、msg=库存不足。数量超过可用库存时自动截断为可用库存；数量未变化时不写库，直接返回成功。",
                 "parameters": [
                     {
                         "name": "id",
@@ -7304,11 +7366,16 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "修改成功",
+                        "description": "修改成功（商品不存在/已下架/库存不足时 code=0）",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": []
                                 }
                             }
                         }
@@ -7324,7 +7391,7 @@
                         }
                     },
                     "404": {
-                        "description": "购物车项不存在或不属于当前用户",
+                        "description": "资源不存在或不属于当前用户",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7354,7 +7421,7 @@
                 ],
                 "summary": "切换购物车商品规格",
                 "operationId": "put.api.v1.cart.spec",
-                "description": "把购物车项从当前 SKU 切换到同一 SPU 下的另一个 SKU。规则：只能切到同一商品的其它规格；目标 SKU 必须上架且有可用库存（stock - locked_stock）；数量超过可用库存时截断。若目标规格已在本用户购物车中，则不新增记录，而是把两边数量合并到目标项（上限为可用库存）并删除当前项，此时返回 merged = true，cart_id 变为合并后的购物车项 ID。",
+                "description": "把购物车项从当前 SKU 切换到同一 SPU 下的另一个 SKU。校验规则：cart_id 不存在或不属于当前用户 → HTTP 404；目标 SKU 或所属 SPU 不存在 → code=0、msg=商品不存在；目标 SKU 不属于当前商品（不同 SPU）→ code=0、msg=只能切换到同一商品的其它规格；目标 SKU 或所属 SPU 已下架/已删除 → code=0、msg=商品已下架。目标 SKU 与当前相同时直接返回当前条目（merged=false）。若目标 SKU 已在本用户购物车中，则不新增记录，而是把两边数量合并到目标项并删除当前项，此时 merged=true，返回的 cart.id 为合并后的购物车项 ID。返回的 cart 结构与购物车列表 items 一致（含 product）。",
                 "parameters": [
                     {
                         "$ref": "#/components/parameters/AppAuthorization"
@@ -7388,7 +7455,7 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "切换成功",
+                        "description": "切换成功（商品不存在/已下架/非同一商品时 code=0）",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -7398,8 +7465,45 @@
                                     "code": 200,
                                     "msg": "ok",
                                     "data": {
-                                        "cart_id": 88,
-                                        "quantity": 3,
+                                        "cart": {
+                                            "id": 88,
+                                            "user_id": 1,
+                                            "sku_id": 113,
+                                            "quantity": 2,
+                                            "is_checked": 1,
+                                            "created_at": "2026-10-30 10:00:00",
+                                            "updated_at": "2026-10-30 10:05:00",
+                                            "created_at_ts": 1761789600,
+                                            "updated_at_ts": 1761789900,
+                                            "product": {
+                                                "spu_id": 3,
+                                                "spu_name": "HUAWEI Mate 70",
+                                                "product_short_name": "Mate 70",
+                                                "sku_name": "HUAWEI Mate 70 曜石黑 256G",
+                                                "image_url": "https://cdn.example.com/sku/113.jpg",
+                                                "sale_price": "1299.00",
+                                                "strike_price": "1599.00",
+                                                "stock": 100,
+                                                "sku_specs": [
+                                                    {
+                                                        "spec_id": 1,
+                                                        "spec_name": "颜色",
+                                                        "spec_value_id": 2,
+                                                        "spec_value": "曜石黑"
+                                                    },
+                                                    {
+                                                        "spec_id": 2,
+                                                        "spec_name": "存储",
+                                                        "spec_value_id": 5,
+                                                        "spec_value": "256G"
+                                                    }
+                                                ],
+                                                "brand_id": 1,
+                                                "brand_name": "华为",
+                                                "brand_logo": "https://cdn.example.com/brand/1.png",
+                                                "offline_reason": ""
+                                            }
+                                        },
                                         "merged": false
                                     }
                                 }
@@ -7417,7 +7521,7 @@
                         }
                     },
                     "404": {
-                        "description": "购物车项不存在或不属于当前用户",
+                        "description": "资源不存在或不属于当前用户",
                         "content": {
                             "application/json": {
                                 "schema": {

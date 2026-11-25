@@ -22,7 +22,7 @@ class CartController extends Controller
             ->first();
         return ApiResponse::success([
             'item_count'     => $row->item_count ?? 0,
-            'total_quantity' => $row->total_quantity ?? 0,
+            'total_quantity' => (int) $row->total_quantity ?? 0,
         ]);
     }
 
