@@ -3,19 +3,17 @@
 namespace App\Http\Controllers\Admin\v1\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Resources\PermissionResource;
 use App\Http\Resources\UserResource;
 use App\Http\Responses\ApiResponse;
 use App\Models\System\User;
+use App\Traits\PermissionPayloadTrait;
 use App\Traits\TokenTrait;
-use App\Traits\TreeTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Permission;
 
 class AuthController extends Controller
 {
-    use TokenTrait, TreeTrait;
+    use TokenTrait, PermissionPayloadTrait;
 
     public function login(Request $request)
     {
@@ -91,41 +89,7 @@ class AuthController extends Controller
             return ApiResponse::error('未登录', 401);
         }
 
-        // 通过 role 关联拿到角色，再拿到角色拥有的权限，最后提取出 name 数组
-        $separated = [
-            'menuPermissions' => [],
-            'buttonPermissions' => [],
-        ];
-        $permission = [];
-        if ($user->hasRole('超级管理员')) {
-            $permission = Permission::all();
-        } else if ($user->roles) {
-            $permission = $user->getAllPermissions();
-        }
-        $formattedPermissions = PermissionResource::collection($permission)->resolve();
-        $separated = $this->separatePermissions($formattedPermissions);
 
-        return ApiResponse::success([
-            'button_permissions' => $separated['buttonPermissions'],
-            'menu_permissions' => $separated['menuPermissions'],
-        ]);
-    }
-
-    /** 根据传入的权限列表, 区分菜单和按钮权限数组 */
-    public function separatePermissions(array $permissions): array
-    {
-        $menuPermissions = [];
-        $buttonPermissions = [];
-        foreach ($permissions as $permission) {
-            if ($permission['type'] == 1) {
-                $menuPermissions[] = $permission;
-            } else {
-                $buttonPermissions[] = $permission['key'];
-            }
-        }
-        return [
-            'menuPermissions' => $this->buildTree($menuPermissions),
-            'buttonPermissions' => $buttonPermissions,
-        ];
+        return ApiResponse::success($this->permissionPayload($user));
     }
 }

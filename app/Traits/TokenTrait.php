@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Auth\AppUser;
+use App\Models\Shop\ShopAdmin;
 use App\Models\System\User;
 
 trait TokenTrait
@@ -16,7 +17,7 @@ trait TokenTrait
     /**
      * 签发 Access Token + Refresh Token
      */
-    protected function issueTokens(AppUser|User $user): array
+    protected function issueTokens(AppUser|User|ShopAdmin $user): array
     {
         $accessExpiresAt = now()->addDays(self::ACCESS_TOKEN_TTL_DAYS);
         $refreshExpiresAt = now()->addDays(self::REFRESH_TOKEN_TTL_DAYS);

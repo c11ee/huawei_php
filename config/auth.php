@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Auth\AppUser;
+use App\Models\Shop\ShopAdmin;
 use App\Models\System\User;
 
 return [
@@ -53,6 +54,11 @@ return [
             'driver' => 'sanctum',
             'provider' => 'app_users',
         ],
+        // 商户后台（商家端）
+        'shop' => [
+            'driver' => 'sanctum',
+            'provider' => 'shop_admin',
+        ],
     ],
 
     /*
@@ -83,6 +89,12 @@ return [
         'app_users' => [
             'driver' => 'eloquent',
             'model' => AppUser::class,
+        ],
+
+        // 商户后台用户
+        'shop_admin' => [
+            'driver' => 'eloquent',
+            'model' => ShopAdmin::class,
         ],
 
         // 'users' => [

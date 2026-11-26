@@ -19,7 +19,6 @@ return new class extends Migration
             $table->unsignedTinyInteger('is_default')->default(0)->comment('是否默认地址 0: 否 1: 是');
             $table->string('mobile', 20)->comment('手机号');
             $table->string('name', 64)->comment('收货人姓名');
-            // 关联 sys_area.id，不建外键：区划数据会整批重建，避免约束阻塞导入
             $table->unsignedBigInteger('province_id')->comment('省份ID');
             $table->unsignedBigInteger('city_id')->comment('城市ID');
             $table->unsignedBigInteger('district_id')->comment('区县ID');
