@@ -86,6 +86,7 @@ class AttachmentController extends Controller
             'folder_id' => 'required|integer',
             'file'      => 'required|file|max:51200', // 限制最大 50MB
             'user_id'   => 'required|integer',
+            'source'    => 'required|string|max:20'
         ]);
 
         if ($request->hasFile('file') && $request->file('file')->isValid()) {
@@ -107,8 +108,9 @@ class AttachmentController extends Controller
 
             // 保存到数据库
             $attachment = Attachment::create([
-                'user_id'       => $request->input('user_id', 0),
-                'folder_id'     => $request->input('folder_id', 0),
+                'user_id'       => (int) $request->input('user_id', 0),
+                'folder_id'     => (int) $request->input('folder_id', 0),
+                'source'        => $request->input('source', 'admin'),
                 'original_name' => $file->getClientOriginalName(),
                 'file_path'     => $filePath,
                 'file_url'      => $fileUrl,
@@ -118,7 +120,10 @@ class AttachmentController extends Controller
                 'recycle'       => 0,
             ]);
 
-            return ApiResponse::success($attachment, '上传成功');
+            return ApiResponse::success(array_merge($attachment->toArray(), [
+                // 'file_url' => 'https://hengjieos-test.oss-cn-shenzhen.aliyuncs.com/202611271711440_1_1_8669.png'
+                'file_url' => 'https://res.vmallres.com/pimages/certification/202610/E2FE7922A1386FF450434C84EC3F9A87.jpg'
+            ]), '上传成功');
         }
 
         return ApiResponse::error('无效的文件');

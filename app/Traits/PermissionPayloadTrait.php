@@ -23,7 +23,9 @@ trait PermissionPayloadTrait
 
         return [
             'menu_permissions'   => $separated['menu_permissions'],
-            'button_permissions' => $separated['button_permissions'],
+            'button_permissions' => array_map(function ($item) {
+                return $item['key'];
+            }, $separated['button_permissions']),
         ];
     }
 

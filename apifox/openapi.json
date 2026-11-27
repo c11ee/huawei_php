@@ -62,6 +62,9 @@
         },
         {
             "name": "测试"
+        },
+        {
+            "name": "OCR识别"
         }
     ],
     "paths": {
@@ -1131,7 +1134,8 @@
                         }
                     }
                 },
-                "x-apifox-folder": "后台/用户管理"
+                "x-apifox-folder": "后台/用户管理",
+                "description": "menu_permissions 为菜单权限树；button_permissions 为按钮权限标识（key）组成的字符串数组，如 [\"user.store\",\"user.update\"]。"
             }
         },
         "/admin/v1/user": {
@@ -5498,12 +5502,19 @@
                                     "user_id": {
                                         "type": "integer",
                                         "example": 7
+                                    },
+                                    "source": {
+                                        "type": "string",
+                                        "maxLength": 20,
+                                        "description": "来源（如 admin、app）",
+                                        "example": "admin"
                                     }
                                 },
                                 "required": [
                                     "folder_id",
                                     "file",
-                                    "user_id"
+                                    "user_id",
+                                    "source"
                                 ]
                             }
                         }
@@ -6822,6 +6833,79 @@
                 "x-apifox-folder": "前台/认证"
             }
         },
+        "/api/v1/common/upload": {
+            "post": {
+                "tags": [
+                    "附件管理"
+                ],
+                "summary": "前台公共上传文件",
+                "operationId": "post.api.v1.common.upload",
+                "description": "前台通用文件上传，未登录也可调用。文件保存到 public 磁盘，source 用于标记来源（如 app）。",
+                "parameters": [],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "type": "object",
+                                "properties": {
+                                    "folder_id": {
+                                        "type": "integer",
+                                        "description": "附件文件夹 ID",
+                                        "example": 0
+                                    },
+                                    "file": {
+                                        "format": "binary",
+                                        "type": "string",
+                                        "description": "请选择要上传的文件"
+                                    },
+                                    "user_id": {
+                                        "type": "integer",
+                                        "description": "用户 ID",
+                                        "example": 7
+                                    },
+                                    "source": {
+                                        "type": "string",
+                                        "maxLength": 20,
+                                        "description": "来源（如 app、admin）",
+                                        "example": "app"
+                                    }
+                                },
+                                "required": [
+                                    "folder_id",
+                                    "file",
+                                    "user_id",
+                                    "source"
+                                ]
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/附件管理"
+            }
+        },
         "/api/v1/logout": {
             "post": {
                 "tags": [
@@ -7542,6 +7626,197 @@
                     }
                 },
                 "x-apifox-folder": "前台/购物车"
+            }
+        },
+        "/api/v1/ocr/idcard": {
+            "post": {
+                "tags": [
+                    "OCR识别"
+                ],
+                "summary": "身份证识别",
+                "operationId": "post.api.v1.ocr.idcard",
+                "description": "调用阿里云 OCR 识别身份证，image 需为可公网访问的图片 URL。data 为解析后的身份证字段：name（姓名）、sex（性别）、ethnicity（民族）、birthDate（出生日期）、address（住址）、idNumber（身份证号），字段缺失时为空字符串；识别失败返回 HTTP 500、code=0。",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "description": "图片 URL（需公网可访问）",
+                                        "example": "https://cdn.example.com/ocr/sample.jpg"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "image": "https://cdn.example.com/ocr/sample.jpg"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "识别成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "name": "张三",
+                                        "sex": "男",
+                                        "ethnicity": "汉",
+                                        "birthDate": "1990-01-01",
+                                        "address": "浙江省杭州市西湖区某某路 1 号",
+                                        "idNumber": "110101199001011234"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（image 缺失）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "身份证识别失败（code=0）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/OCR识别"
+            }
+        },
+        "/api/v1/ocr/business-license": {
+            "post": {
+                "tags": [
+                    "OCR识别"
+                ],
+                "summary": "营业执照识别",
+                "operationId": "post.api.v1.ocr.business-license",
+                "description": "调用阿里云 OCR 识别营业执照，image 需为可公网访问的图片 URL。data 为解析后的营业执照字段：companyName（企业名称）、creditCode（统一社会信用代码）、companyType（企业类型）、legalPerson（法定代表人）、registeredCapital（注册资本）、businessAddress（经营场所）、businessScope（经营范围）、RegistrationDate（成立日期）、issueDate（发照日期）、validFromDate（营业期限起始日期）、title（标题），字段缺失时为空字符串；识别失败返回 HTTP 500、code=0。",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/AppAuthorization"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": [
+                                    "image"
+                                ],
+                                "properties": {
+                                    "image": {
+                                        "type": "string",
+                                        "description": "图片 URL（需公网可访问）",
+                                        "example": "https://cdn.example.com/ocr/sample.jpg"
+                                    }
+                                }
+                            },
+                            "example": {
+                                "image": "https://cdn.example.com/ocr/sample.jpg"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "识别成功",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                },
+                                "example": {
+                                    "code": 200,
+                                    "msg": "ok",
+                                    "data": {
+                                        "RegistrationDate": "2020-01-01",
+                                        "businessAddress": "上海市浦东新区某某路 1 号",
+                                        "businessScope": "技术服务、技术开发、技术咨询",
+                                        "companyName": "某某科技有限公司",
+                                        "companyType": "有限责任公司",
+                                        "creditCode": "91310000MA1K000000",
+                                        "issueDate": "2020-01-01",
+                                        "legalPerson": "李四",
+                                        "registeredCapital": "100 万元人民币",
+                                        "title": "营业执照",
+                                        "validFromDate": "2020-01-01"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "未登录或 Token 失效",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "参数校验失败（image 缺失）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "营业执照识别失败（code=0）",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ApiResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "x-apifox-folder": "前台/OCR识别"
             }
         }
     },

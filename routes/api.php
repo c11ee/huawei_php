@@ -1,10 +1,12 @@
 <?php
 
+use App\Http\Controllers\Admin\v1\Attachment\AttachmentController;
 use App\Http\Controllers\Admin\v1\Product\CategoryController;
 use App\Http\Controllers\Api\v1\Address\AddressController;
 use App\Http\Controllers\Api\v1\Auth\AuthController;
 use App\Http\Controllers\Api\v1\Cart\CartController;
 use App\Http\Controllers\Api\v1\Home\HomeController;
+use App\Http\Controllers\Api\v1\Ocr\OcrController;
 use App\Http\Controllers\Api\v1\Product\ProductController;
 use App\Http\Controllers\Api\v1\Search\SearchController;
 use App\Http\Controllers\TestController;
@@ -55,6 +57,10 @@ Route::prefix('api')->group(function () {
             'ability:refresh-token'
         ])->post('refresh-token', [AuthController::class, 'refreshToken']);
 
+        Route::prefix('common')->group(function () {
+            Route::post('/upload', [AttachmentController::class, 'upload']);
+        });
+
         Route::middleware(['auth:app', 'ability:access-api'])->group(function () {
             // 写在 auth:app middleware 里，才能获取到用户信息
             Route::post('logout', [AuthController::class, 'logout']);
@@ -82,6 +88,11 @@ Route::prefix('api')->group(function () {
                 Route::put('/quantity/{id}', [CartController::class, 'updateQuantity']);
                 Route::delete('/', [CartController::class, 'destroy']);
                 Route::put('/spec', [CartController::class, 'updateSpec']);
+            });
+
+            Route::prefix('ocr')->group(function () {
+                Route::post('/idcard', [OcrController::class, 'recognizeIdcard']);
+                Route::post('/business-license', [OcrController::class, 'recognizeBusinessLicense']);
             });
         });
     });

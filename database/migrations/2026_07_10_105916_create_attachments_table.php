@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('folder_id');
+            $table->string('source', 20)->default('admin')->comment('来源');
             $table->string('original_name')->comment('原始文件名');
             $table->string('file_path')->comment('本地存储相对路径');
             $table->string('file_url')->comment('完整 URL');
