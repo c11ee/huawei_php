@@ -46,7 +46,8 @@ class DypnsapiService
     public function sendLoginCode(string $phone): bool
     {
         // local 环境不真实发送短信，直接返回成功
-        if ($testCode = $this->testCode()) {
+        $testCode = $this->testCode();
+        if ($testCode !== null) {
             Log::info("local 环境未真实发送短信: phone={$phone}, code={$testCode}");
             return true;
         }
@@ -75,7 +76,8 @@ class DypnsapiService
     public function checkCode(string $phone, string $code): bool
     {
         // local 环境直接比对固定验证码
-        if ($testCode = $this->testCode()) {
+        $testCode = $this->testCode();
+        if ($testCode !== null) {
             return $code === $testCode;
         }
 
